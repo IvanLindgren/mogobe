@@ -1,0 +1,6 @@
+#registration-popup{border:0;padding:0;background:transparent;width:min(768px,calc(100vw - 32px));max-width:none;overflow:visible}
+#registration-popup::backdrop{background:rgba(0,0,0,.45)}
+#registration-popup-movie{width:100%;aspect-ratio:8/5}
+#registration-popup ruffle-player{display:block;width:100%;height:100%}
+#registration-popup>div:not(#registration-popup-movie){padding:24px;background:white;color:#173359;font:16px Arial,sans-serif;text-align:center}
+#registration-popup button{font:inherit;cursor:pointer;padding:8px 20px}

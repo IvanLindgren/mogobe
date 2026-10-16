@@ -1,0 +1,13 @@
+{
+  "original_game_asset": false,
+  "original_graphics": true,
+  "source": "assets/original/Swf/Assets/Popups/WorldMapRussian.swf",
+  "source_sha256": "0f930e6fec68ad93929ec23f86a5d3b621d436fc06f9b5dc451abbb69d510f99",
+  "generator": "tools/build_map_additions.py",
+  "button_symbol": "p_3_fla.AravaBtn2_11",
+  "fragment_class": "MogobeBumagMapFragment",
+  "loading": "Preload once at startup; instantiate original fragment for each popup",
+  "map_object": 286,
+  "map_depths": "2-55 (island scenery and original button)",
+  "sha256": "48e614eea96b08ec72399f9f27113f295e9b4d4ad710eb51b1947c8781e1c2fd"
+}

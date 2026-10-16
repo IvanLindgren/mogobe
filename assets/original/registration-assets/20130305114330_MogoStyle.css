@@ -1,0 +1,131 @@
+﻿.TopTitle
+{
+    color:#59A212;
+    font-size:14pt;
+    font-family:Arial;
+    font-weight: 900;
+    vertical-align:text-top;
+}
+.TopTitleHeb
+{
+    color:#59A212;
+    font-size:18px;
+    font-family:Arial;
+    font-weight: 900;
+    vertical-align:text-top;
+}
+
+.MainTitleReg
+{
+	font-family :Arial;
+	font-weight :bold;
+	font-size	:21px;
+	color		:#05acbe
+}
+
+.MidTitle
+{
+	font-family :Arial;
+	font-weight :bold;
+	font-size	:14px;
+	color		:#356120
+}
+
+
+.SecondaryTitleReg
+{
+	color:#3b7205;
+	font-family:Arial;
+	font-size:16px;
+	font-weight:bold;
+}
+
+.CheckBoxTitle
+{
+	color:#05acbe;
+	font-family:Arial;
+	font-size:16px;
+	font-weight:bold;
+}
+.Remarks
+{
+	color:#244404;
+	font-family:Arial;
+	font-size:14px;
+	font-weight:normal;
+}
+
+.TxtRegualr
+{
+	color:#3b7205;
+	font-size:14px;
+	font-family:Arial;
+	font-weight:normal;
+}
+
+.TxtSmall
+{
+	color:#3b7205;
+	font-size:12px;
+	font-family:Arial;
+	font-weight:normal;
+}
+
+.error
+{
+	color:#ffffff;
+    font-size: 16px;
+    font-family:Ariel;
+    font-weight:bold;
+}
+.BigInput
+{
+	text-align:center;
+}
+.Input
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight:normal;
+	color: #000000;
+	border:  solid #8ab71e;
+	border-width:2px;
+}
+
+.RegInput
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	font-weight:normal;
+	color: #000000;
+	border:  solid #8ab71e;
+	border-width:2px;
+}
+
+
+.InputLogin
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight:normal;
+	color: #000000;
+	border:  solid #4b9f09;
+	border-width:2px;
+}
+
+
+.ErrorMsg
+{
+	color:#ffffff;
+	font-size:16px;
+	font-family:Arial;
+	font-weight:Bold;
+}
+
+.filedTitle
+{
+	font-family:Arial;
+	font-weight:bold;
+	font-size:14pt;
+	color: #05acbe;
+}

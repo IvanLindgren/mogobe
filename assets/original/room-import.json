@@ -1,0 +1,608 @@
+{
+  "description": "Импорт оригинальных локаций; география маршрутов восстановлена частично.",
+  "rooms": [
+    {
+      "key": "africa",
+      "swf": "Africa",
+      "title": "Африка",
+      "source_sha256": "6d2177628f674ba29142a471b51bf0ae3590d89bb685f28419230ac7f37cd255"
+    },
+    {
+      "key": "bar",
+      "swf": "Bar",
+      "title": "Кактус",
+      "source_sha256": "26d04bf0961fc48baf2e3f3f2763d5f3bca4eeffa20ef5cf4c0ff4cbacc5996c"
+    },
+    {
+      "key": "bowlingroom",
+      "swf": "BowlingRoom",
+      "title": "Боулинг",
+      "source_sha256": "622e120c6feba4e8c69f5febbe69130222c7bd88cb7271e6a4f29ebe8e92a4a1"
+    },
+    {
+      "key": "bumagsfoodtoysstore",
+      "swf": "BumagsFoodToysStore",
+      "title": "Еда и игрушки для бумагов",
+      "source_sha256": "7002211454a48522b3d297eeb508291e9ae9fa230e7ecc362e8023d33680e05b"
+    },
+    {
+      "key": "bumagspotionstore",
+      "swf": "BumagsPotionStore",
+      "title": "Зелья для бумагов",
+      "source_sha256": "10d3a779633c433181885441c551d41540f79f2a93267c0b0399ac33a3cfdcf9"
+    },
+    {
+      "key": "bumagsstore",
+      "swf": "BumagsStore",
+      "title": "Магазин бумагов",
+      "source_sha256": "6d04edba39b67247221edb8e363cec9db60c8334777830205c980e51a17af22d"
+    },
+    {
+      "key": "bumagvale",
+      "swf": "BumagVale",
+      "title": "Долина бумагов",
+      "source_sha256": "614973a71683e62fd1b73b8aa1c90126ec323d9f2935f62750c2d9e8bcb375a8"
+    },
+    {
+      "key": "caeteorube",
+      "swf": "CaeteOrube",
+      "title": "CaeteOrube",
+      "source_sha256": "72d03a582b820da669a923a6bce2e18ca2ada7ff59d3f89cb4370c31ee8797d8"
+    },
+    {
+      "key": "castleinnera",
+      "swf": "CastleInnerA",
+      "title": "Замок: зал",
+      "source_sha256": "38874a3fcf05738a451105862bdb9056c3e17506cbdf97cbf4399e7e0a6ce6e4"
+    },
+    {
+      "key": "castleinnerb",
+      "swf": "CastleInnerB",
+      "title": "Замок: покои",
+      "source_sha256": "71937a7f4eb5d3a53dcfa8fe2712b2edeb5412be6493136defa0031540397b15"
+    },
+    {
+      "key": "cinemaroom",
+      "swf": "CinemaRoom",
+      "title": "Кинотеатр",
+      "source_sha256": "12ceebffda1f96a83c2267c8fee29d7f50d5962410076317dfe2b42ae14fb053"
+    },
+    {
+      "key": "clothesstore",
+      "swf": "ClothesStore",
+      "title": "Стиляги",
+      "source_sha256": "16de3176feb382415e3474357e7f45564e2162e582ce3d22c44519e26a35006a"
+    },
+    {
+      "key": "fearcavegate",
+      "swf": "FearCaveGate",
+      "title": "Вход в Пещеру Смелых",
+      "source_sha256": "041912cc7b3c678247c7692ba421f8b59a49701bbd4f23372968387b1fecb7ab"
+    },
+    {
+      "key": "fightingbomagschool",
+      "swf": "FightingBomagSchool",
+      "title": "Школа бумагов",
+      "source_sha256": "38d9efb2802c2d4e8328f8e773ed23015abfa4c67c42938b16e7815997b177c3"
+    },
+    {
+      "key": "fightingbomagschoolindoor",
+      "swf": "FightingBomagSchoolIndoor",
+      "title": "Зал школы бумагов",
+      "source_sha256": "922ff9ff702a7a2dece5b907f632eb82c00edc9766cd6c40edcda1671e9eb429"
+    },
+    {
+      "key": "foresttree",
+      "swf": "ForestTree",
+      "title": "Полое дерево",
+      "source_sha256": "4534b0ffabad31aa357a36881bca9b8e1abadd2f22ae2f52aa1ac29eb77165bb"
+    },
+    {
+      "key": "furniturestore",
+      "swf": "FurnitureStore",
+      "title": "МогоДом",
+      "source_sha256": "d365fa429a8f7bc09667cd23c7575b018c5eaa33c8e009373cd9162e4658c46e"
+    },
+    {
+      "key": "halloffame",
+      "swf": "HallOfFame",
+      "title": "Зал славы",
+      "source_sha256": "e5d89a1e660efa3c5e8c2453b1bf08b30d88fb1ea01df12240e3bffe3c667876"
+    },
+    {
+      "key": "hoopsroom",
+      "swf": "HoopsRoom",
+      "title": "Баскетбол",
+      "source_sha256": "ae71ebaaeb834e8a1216e06e261c7e873f81943cd65fc398b0d192d15f83ab0a"
+    },
+    {
+      "key": "hotel",
+      "swf": "Hotel",
+      "title": "Отель",
+      "source_sha256": "6358666e84a67b2c6efcc94851e623aae31df4ba3abf0b2eba699082990b843f"
+    },
+    {
+      "key": "infoboard",
+      "swf": "InfoBoard",
+      "title": "Доска объявлений",
+      "source_sha256": "79bc10ec2cca925e562a18270bec447b547741a262a327b49437cf7b034f2b10"
+    },
+    {
+      "key": "island",
+      "swf": "Island",
+      "title": "Остров",
+      "source_sha256": "a122172759e8890046b93c63caaf215e7c661f9eb630e7e545a7fecb53b27fc4"
+    },
+    {
+      "key": "jewelrystore",
+      "swf": "JewelryStore",
+      "title": "Мастерская украшений",
+      "source_sha256": "26a009380c3c37709865a1b502cd8108f0d43d014c35474cd29f7fa0feb3b45b"
+    },
+    {
+      "key": "kingsroad",
+      "swf": "KingsRoad",
+      "title": "Солнечная улица",
+      "source_sha256": "25c8fea080469a705065614de58c64ca6fab5912312c8d212608c6c2f0a63ff7"
+    },
+    {
+      "key": "magicforest",
+      "swf": "MagicForest",
+      "title": "Зачарованный лес",
+      "source_sha256": "0a01ad06dda2611053e9890ad8f8339b0aa733df8f62756df67bc3dfdd90bcb6"
+    },
+    {
+      "key": "mall",
+      "swf": "Mall",
+      "title": "Могоцентр",
+      "source_sha256": "e12036e729a9909fe8eee88ae619fb2db751f4d6c5a3bd802c3ed94099e64b3f"
+    },
+    {
+      "key": "maze_entrance",
+      "swf": "maze_entrance",
+      "title": "Вход в лабиринт",
+      "source_sha256": "e01a36d8e587f8423790da6132f0fa8880f2846189b87c01edb0813d92af979f"
+    },
+    {
+      "key": "meetingroom",
+      "swf": "MeetingRoom",
+      "title": "Комната дозорных",
+      "source_sha256": "e32174e28bb0a6c2c439fff24e012861ddb6efcf6ffff773d429f54b9c467506"
+    },
+    {
+      "key": "mexico",
+      "swf": "Mexico",
+      "title": "Мексика",
+      "source_sha256": "431bd5399192bf0326993740e2d5c52f7ef8505f0c725ec9c2f2a94767e76a9f"
+    },
+    {
+      "key": "mogoplay",
+      "swf": "MogoPlay",
+      "title": "Планета игр",
+      "source_sha256": "0549d42596de50b2b3111fc066a53a4d0cdcff0017bae8c7b3962daf39337dda"
+    },
+    {
+      "key": "novograd",
+      "swf": "Novograd",
+      "title": "Новоград",
+      "source_sha256": "26038377d82b52bf2b7cd9c6964d1482ea3d9b7f430bba1f9427332eb15d8059"
+    },
+    {
+      "key": "omgzone",
+      "swf": "OMGzone",
+      "title": "OMG Zone",
+      "source_sha256": "f21c353f83f1f462d70504d0b5c026723338e30598e1567a66f36521082a1fa7"
+    },
+    {
+      "key": "partyroom_pirates",
+      "swf": "PartyRoom_Pirates",
+      "title": "Пиратская вечеринка",
+      "source_sha256": "c0771ab4f62474aa019d660ee034458a467127e579bed5103960c1c3116312d9"
+    },
+    {
+      "key": "partyroom_reg",
+      "swf": "PartyRoom_Reg",
+      "title": "Танцевальная вечеринка",
+      "source_sha256": "242d96ca20bd66ef33c5c3d56f38a53797885ec405ac4b34d38f961681f14aa6"
+    },
+    {
+      "key": "partyroom_sweets",
+      "swf": "PartyRoom_Sweets",
+      "title": "Сладкая вечеринка",
+      "source_sha256": "2cdf80b97e8c768b55850af85f7013f245d2170cce9089aace7aac640da3b07a"
+    },
+    {
+      "key": "pool",
+      "swf": "Pool",
+      "title": "Бассейн",
+      "source_sha256": "9d1f8cbb07e84bef788ba2b01a2fba3f641fa36da5db9ee96aafb6b2e39775d1"
+    },
+    {
+      "key": "port",
+      "swf": "Port",
+      "title": "Весёлая гавань",
+      "source_sha256": "d14063126591123065498d5e148759ce50ab4e76e479988dff77fef6c686e912"
+    },
+    {
+      "key": "profymeetingroom",
+      "swf": "ProfyMeetingRoom",
+      "title": "Тайная комната Профи",
+      "source_sha256": "382e86b45968594aa7ca0362d790747b500119660c3952dab90db4a15f2d3f40"
+    },
+    {
+      "key": "profyquiz",
+      "swf": "ProfyQuiz",
+      "title": "Викторина Профи",
+      "source_sha256": "1de219a5fc4262905207e7644ee08bb147f4b1043f24aa14b56470772300247c"
+    },
+    {
+      "key": "profyroom",
+      "swf": "ProfyRoom",
+      "title": "Комната Профи",
+      "source_sha256": "fdf01ce17d59da06d2728e9eb5d92e27d6ddebdc2ba0f6cb35a523b731956ab3"
+    },
+    {
+      "key": "severburg",
+      "swf": "Severburg",
+      "title": "Севербург",
+      "source_sha256": "fa3a8832e865ea9c3b04260c7167420e92494f843049a9edb194316ff9cc7bfc"
+    },
+    {
+      "key": "ship",
+      "swf": "Ship",
+      "title": "Корабль",
+      "source_sha256": "80d745d50fcb2910d3416379ac3dec30c3f0056b21edbda699d2568257574fc6"
+    },
+    {
+      "key": "skazkino",
+      "swf": "Skazkino",
+      "title": "Сказкино",
+      "source_sha256": "588f83d1b7f13d10aa8061e2e91ae1787bbd6a4a95fe5f549c3599349c6f29c2"
+    },
+    {
+      "key": "spa",
+      "swf": "Spa",
+      "title": "Спа",
+      "source_sha256": "67c21680590f0c53a9ba550710bd4d494ccda4ea27962f59322e7a30916feef4"
+    },
+    {
+      "key": "sportstore",
+      "swf": "SportStore",
+      "title": "Лига",
+      "source_sha256": "811482fbd636c4b9c22fe13a9b88f5f4071ecf868423a9285841ec64d951b54f"
+    },
+    {
+      "key": "submarine",
+      "swf": "Submarine",
+      "title": "Подводная лодка",
+      "source_sha256": "4f02831f0a2bbc57e8f5ac0959f163cf933a601a21cd833ff0ab5a83ea835200"
+    },
+    {
+      "key": "summercamp",
+      "swf": "SummerCamp",
+      "title": "Отдыхаево",
+      "source_sha256": "e0252a5b2c78b0dd0c7c3747c6b0ebc6acce872fd8cdcb38706dd0ed46d30532"
+    },
+    {
+      "key": "sunandsea",
+      "swf": "Sunandsea",
+      "title": "Солнцеморье",
+      "source_sha256": "7fe8275cd5e6172d6a426462ff82a7af9b060f824629d41ac74866fb7e6a352f"
+    },
+    {
+      "key": "vugovo",
+      "swf": "Vugovo",
+      "title": "Вьюгово",
+      "source_sha256": "134d94cebd8e2edcb74ceb6df5f0aa2723a985b734f535fd83d69142155e7367"
+    },
+    {
+      "key": "jewelryexhibition",
+      "swf": "JewelryExhibition",
+      "title": "Выставка украшений",
+      "source_sha256": "cc769d037b64d1d43a134a2b15083ff9467f7a7da5ad4ce961862f4d4ebf594a"
+    }
+  ],
+  "resolved_exits": 87,
+  "unresolved_exits": [
+    {
+      "room": "Bar",
+      "entry": "mcEntryPoint_22",
+      "token": "22"
+    },
+    {
+      "room": "BowlingRoom",
+      "entry": "mcEntryPoint_33",
+      "token": "33"
+    },
+    {
+      "room": "BowlingRoom",
+      "entry": "mcEntryPoint_32",
+      "token": "32"
+    },
+    {
+      "room": "BowlingRoom",
+      "entry": "mcEntryPoint_31",
+      "token": "31"
+    },
+    {
+      "room": "BumagsFoodToysStore",
+      "entry": "mcEntryPoint_154",
+      "token": "154"
+    },
+    {
+      "room": "CaeteOrube",
+      "entry": "mcEntryPoint_22",
+      "token": "22"
+    },
+    {
+      "room": "CaeteOrube",
+      "entry": "mcEntryPoint_23",
+      "token": "23"
+    },
+    {
+      "room": "CaeteOrube",
+      "entry": "mcEntryPoint_62",
+      "token": "62"
+    },
+    {
+      "room": "CaeteOrube",
+      "entry": "mcEntryPoint_65",
+      "token": "65"
+    },
+    {
+      "room": "CastleInnerA",
+      "entry": "mcEntryPoint_166",
+      "token": "166"
+    },
+    {
+      "room": "CinemaRoom",
+      "entry": "mcEntryPoint_65",
+      "token": "65"
+    },
+    {
+      "room": "ClothesStore",
+      "entry": "mcEntryPointPass_230",
+      "token": "230"
+    },
+    {
+      "room": "FearCaveGate",
+      "entry": "mcEntryPoint_77",
+      "token": "77"
+    },
+    {
+      "room": "HoopsRoom",
+      "entry": "mcEntryPoint_27",
+      "token": "27"
+    },
+    {
+      "room": "HoopsRoom",
+      "entry": "mcEntryPoint_26",
+      "token": "26"
+    },
+    {
+      "room": "HoopsRoom",
+      "entry": "mcEntryPoint_28",
+      "token": "28"
+    },
+    {
+      "room": "Hotel",
+      "entry": "mcEntryPoint_36",
+      "token": "36"
+    },
+    {
+      "room": "InfoBoard",
+      "entry": "mcEntryPoint_34",
+      "token": "34"
+    },
+    {
+      "room": "Island",
+      "entry": "mcEntryPoint_126",
+      "token": "126"
+    },
+    {
+      "room": "JewelryStore",
+      "entry": "mcEntryPoint_84",
+      "token": "84"
+    },
+    {
+      "room": "JewelryStore",
+      "entry": "mcEntryPoint_84",
+      "token": "84"
+    },
+    {
+      "room": "KingsRoad",
+      "entry": "mcEntryPoint_56",
+      "token": "56"
+    },
+    {
+      "room": "KingsRoad",
+      "entry": "mcEntryPoint_129",
+      "token": "129"
+    },
+    {
+      "room": "Mall",
+      "entry": "mcEntryPoint_37",
+      "token": "37"
+    },
+    {
+      "room": "MogoPlay",
+      "entry": "mcEntryPoint_29",
+      "token": "29"
+    },
+    {
+      "room": "MogoPlay",
+      "entry": "mcEntryPoint_53",
+      "token": "53"
+    },
+    {
+      "room": "MogoPlay",
+      "entry": "mcEntryPoint_135",
+      "token": "135"
+    },
+    {
+      "room": "MogoPlay",
+      "entry": "mcEntryPoint_50",
+      "token": "50"
+    },
+    {
+      "room": "MogoPlay",
+      "entry": "mcEntryPoint_72",
+      "token": "72"
+    },
+    {
+      "room": "MogoPlay",
+      "entry": "mcEntryPoint_43",
+      "token": "43"
+    },
+    {
+      "room": "MogoPlay",
+      "entry": "mcEntryPoint_52",
+      "token": "52"
+    },
+    {
+      "room": "MogoPlay",
+      "entry": "mcEntryPoint_98",
+      "token": "98"
+    },
+    {
+      "room": "Novograd",
+      "entry": "mcEntryPointPass_70",
+      "token": "70"
+    },
+    {
+      "room": "Pool",
+      "entry": "mcEntryPoint_38",
+      "token": "38"
+    },
+    {
+      "room": "Port",
+      "entry": "mcEntryPoint_3140",
+      "token": "3140"
+    },
+    {
+      "room": "Port",
+      "entry": "mcEntryPoint_124",
+      "token": "124"
+    },
+    {
+      "room": "Severburg",
+      "entry": "mcEntryPoint_23",
+      "token": "23"
+    },
+    {
+      "room": "Severburg",
+      "entry": "mcEntryPoint_37",
+      "token": "37"
+    },
+    {
+      "room": "Severburg",
+      "entry": "mcEntryPoint_64",
+      "token": "64"
+    },
+    {
+      "room": "Severburg",
+      "entry": "mcEntryPoint_81",
+      "token": "81"
+    },
+    {
+      "room": "Ship",
+      "entry": "mcEntryPoint_103",
+      "token": "103"
+    },
+    {
+      "room": "Ship",
+      "entry": "mcEntryPoint_121",
+      "token": "121"
+    },
+    {
+      "room": "Skazkino",
+      "entry": "mcEntryPoint_71",
+      "token": "71"
+    },
+    {
+      "room": "Spa",
+      "entry": "mcEntryPoint_1",
+      "token": "1"
+    },
+    {
+      "room": "SportStore",
+      "entry": "mcEntryPointPass_63",
+      "token": "63"
+    },
+    {
+      "room": "SummerCamp",
+      "entry": "mcEntryPoint_49",
+      "token": "49"
+    },
+    {
+      "room": "SummerCamp",
+      "entry": "mcEntryPoint_73",
+      "token": "73"
+    },
+    {
+      "room": "Sunandsea",
+      "entry": "mcEntryPoint_44",
+      "token": "44"
+    },
+    {
+      "room": "Sunandsea",
+      "entry": "mcEntryPointPass_131",
+      "token": "131"
+    },
+    {
+      "room": "Vugovo",
+      "entry": "mcEntryPoint_99",
+      "token": "99"
+    },
+    {
+      "room": "Vugovo",
+      "entry": "mcEntryPoint_80",
+      "token": "80"
+    }
+  ],
+  "special_scenes": [
+    {
+      "name": "FearCave",
+      "reason": "Original scene has no ordinary walking layer",
+      "sha256": "64e939843d4a2a3439332e814a4e67ded31479648dc183ec5213d783a971397d"
+    },
+    {
+      "name": "SpaceshipBridge",
+      "reason": "Original scene has no ordinary walking layer",
+      "sha256": "5a6ddd4c0276d7d53614147e02313b1e51c9838c77644c67c8355eb3ca40e36c"
+    }
+  ],
+  "standalone_assets": [
+    "Swf/Games/GoldFishing.swf",
+    "Swf/Apps/BeautySalon.swf",
+    "Swf/Apps/BulletinBoard.swf"
+  ],
+  "world_map": "Swf/Assets/Popups/WorldMap.swf",
+  "preview_command": "/room <SWF name or Russian title>",
+  "preserved_previous_rooms": "Swf/Rooms/Preserved/",
+  "world_map_additions": {
+    "source": "Swf/Assets/Popups/WorldMapRussian.swf",
+    "button": "p_3_fla.AravaBtn2_11",
+    "map_object": 286,
+    "compat": "assets/compat/WorldMapBumagLand.swf"
+  },
+  "runtime_room_adjustments": [
+    {
+      "room": "MagicForest",
+      "entry": "mcEntryPoint_440",
+      "position": [
+        100,
+        330
+      ]
+    }
+  ],
+  "spawn_policy": {
+    "start_room": "Novograd",
+    "random_main_walking_layer": true,
+    "avoid_entry_triggers": true,
+    "avoid_other_players_radius": 36,
+    "walk_transition": "near return doorway; inferred physical doorway for four one-way links",
+    "f5": "same room, one-use session-bound in-memory intent, 60 seconds",
+    "sqlite_positions": false
+  }
+}

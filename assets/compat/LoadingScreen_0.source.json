@@ -1,0 +1,6 @@
+{
+  "original_game_asset": false,
+  "source": "tools/build_loading_stub.py",
+  "role": "Empty AS3 mlLoadingScreen_0 linkage required by original Main. The visible loading animation remains OriginalPreloader.swf.",
+  "sha256": "4bd7284d1a0bffe59d264cd1baeeac965234987360911c9b7e71f414c22c0187"
+}

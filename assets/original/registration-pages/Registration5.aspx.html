@@ -1,0 +1,347 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="description"  content="Регистрация в Мире Могоби." />
+ 
+    <style type="text/css">
+        html, body, #wrapper
+        {
+            margin: 0;
+            padding: 0;
+            border: none;
+            text-align: center;
+        }
+        #wrapper
+        {
+            margin: 0 auto;
+            text-align: left;
+            vertical-align: middle;
+            width: 100%;
+        }
+        #page
+        {
+            margin: 0 auto;
+            width: 770px;
+        }
+    </style>
+    <link href="/css/MogoStyle.css" rel="stylesheet" type="text/css" /><title>
+
+</title>
+    <script src="/JS/Util.js" language="javascript" type="text/javascript" ></script>
+    <script language="javascript" type="text/javascript">
+
+
+    
+window.Alert = function(text)
+{
+    var opt = "dialogWidth:350px;dialogTop:300px;dialogLeft:300;dialogHeight:230px;scroll:no; status:off";
+    var obj = new Object();
+    obj.text = text;
+    window.showModalDialog("MessageBox.aspx",obj,opt);
+}
+
+var lastImage = new Image();
+var Link1 = new Array(3)
+
+Link1[0] = new Image();
+Link1[1] = new Image();
+Link1[2] = new Image();
+
+Link1[0].src = "Media/images/Registration/parents_btn.gif";
+Link1[1].src = "Media/images/Registration/parents_down.gif";
+Link1[2].src = "Media/images/Registration/parents_over.gif";
+
+function onOver(img, link)
+{
+    var m = eval("Link" + link);
+    lastImage = img.src;
+    if(img.src != m[1].src)
+    {
+        img.src = m[2].src;
+    }
+}
+
+function onOut(img)
+{
+    img.src = lastImage;
+}
+    </script>
+
+</head>
+<body id="ctl00_mainBody" scroll="yes" background="Media/images/CleanBG.png">
+    <form name="aspnetForm" method="post" action="Registration5.aspx" id="aspnetForm">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKLTE1ODE5NzY5OA9kFgJmD2QWAgIDD2QWAgIBD2QWAgIBD2QWAmYPZBYCZg9kFgYCAQ9kFgQCDQ9kFgJmDw8WBB4MQmFja0ltYWdlVXJsBSx+L01lZGlhL2ltYWdlcy9SZWdpc3RyYXRpb24vZXJyb3JNZXNzYWdlLmdpZh4EXyFTQgKAgARkZAIOD2QWAmYPDxYEHwAFLH4vTWVkaWEvaW1hZ2VzL1JlZ2lzdHJhdGlvbi9lcnJvck1lc3NhZ2UuZ2lmHwECgIAEZGQCAg9kFgICAQ9kFgICAQ8WAh4EVGV4dAW8Azx0cj48dGQ+PGltZyBzcmM9J01lZGlhL2ltYWdlcy9SZWdpc3RyYXRpb24vcHJvZ3Jlc3NfY2hlY2suZ2lmJyAvPjwvdGQ+PC90cj48dHI+PHRkPjxpbWcgc3JjPSdNZWRpYS9pbWFnZXMvUmVnaXN0cmF0aW9uL3Byb2dyZXNzX2NoZWNrLmdpZicgLz48L3RkPjwvdHI+PHRyPjx0ZD48aW1nIHNyYz0nTWVkaWEvaW1hZ2VzL1JlZ2lzdHJhdGlvbi9wcm9ncmVzc19jaGVjay5naWYnIC8+PC90ZD48L3RyPjx0cj48dGQ+PGltZyBzcmM9J01lZGlhL2ltYWdlcy9SZWdpc3RyYXRpb24vcHJvZ3Jlc3NfY2hlY2suZ2lmJyAvPjwvdGQ+PC90cj48dHI+PHRkPjxpbWcgc3JjPSdNZWRpYS9pbWFnZXMvUmVnaXN0cmF0aW9uL3Byb2dyZXNzLmdpZicgLz48L3RkPjwvdHI+PHRyPjx0ZD48aW1nIHNyYz0nTWVkaWEvaW1hZ2VzL1JlZ2lzdHJhdGlvbi9wcm9ncmVzcy5naWYnIC8+PC90ZD48L3RyPmQCAw9kFgICAQ8PZBYEHgtvbm1vdXNlb3ZlcgUTZG9PdmVyRWZmZWN0KGV2ZW50KR4Kb25tb3VzZW91dAUSZG9PdXRFZmZlY3QoZXZlbnQpZBgBBR5fX0NvbnRyb2xzUmVxdWlyZVBvc3RCYWNrS2V5X18WAwUaY3RsMDAkcmVnSG9sZGVyXzEkYnRuQWdyZWUFH2N0bDAwJHJlZ0hvbGRlcl8xJGJ0bkVtYWlsQWdyZWUFG2N0bDAwJHJlZ0hvbGRlcl8zJGJ0blN1Ym1pdA0qHh1ljdq6A/WfTggccO0NwCWQ" />
+
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEWBAKuvdPsDgL+6J3ECQLRj8nyBgL9uozCDOF2ZNGVvh5TS2l3i2PmO/l8oAQI" />
+    <center>
+        <table width="100%" height="100%" border="0">
+            <tr>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <table id="ctl00_Table2" cellspacing="0" cellpadding="0" border="0" height="565" width="875" background="Media/images/Registration/BG_screen.gif">
+	<tr>
+		<td>
+                                <table border="0" cellpadding="0" width="875px" cellspacing="0" height="565">
+                                    <tr>
+                                        <td width="90" height="0"><img src="Media/images/tab.gif" width="90" height="1" alt="" /></td>
+                                        <td width="683" height="0"><img src="Media/images/tab.gif" width="683" height="1" alt="" /></td>
+                                        <td width="95" height="0"><img src="Media/images/tab.gif" width="95" height="1" alt="" /></td>
+                                    </tr>
+                                    <tr valign="top">
+                                        <td>
+                                        </td>
+                                        <td rowspan="2">
+                                            <table cellpadding="0" cellspacing="0" id="Table3" border="0" width="683">
+                                                <tr><img src="Media/images/tab.gif" width="1" height="10" alt="" /></tr>
+                                                <tr>
+                                                   
+                                                    <td align="center" colspan="3" valign="top">
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="ctl00_lblFreeAccount" class="TopTitle"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <img src="Media/images/tab.gif" width="1" height="422" alt="" />
+                                                    </td>
+                                                    <td align="center" valign="top" dir="">
+                                                        
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td colspan="3" align="center">
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="ctl00_regHolder_1_lblRuls" class="MainTitleReg">Правила</span><p />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <img src="Media/images/tab.gif" width="100" height="1" border="0" alt="" />
+            </td>
+            <td align="left" valign="middle" colspan="3">
+            
+                <table>
+                    <tr>
+                        <td valign="top"><img src="Media/images/Registration/notice.gif" alt="notice" /></td>
+                        <td><span id="ctl00_regHolder_1_lblRule4" class="CheckBoxTitle">Проявляйте взаимоуважение!</span><br />
+                            <span id="ctl00_regHolder_1_lblRule7" class="TxtRegualr">В мире Могоби запрещено использовать оскорбительные слова и вести себя невежливо по отношению к другим игрокам.</span><br /></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><img src="Media/images/Registration/notice.gif" alt="notice" /></td>
+                        <td><span id="ctl00_regHolder_1_lblRule6" class="CheckBoxTitle">Ни в коем случае не сообщайте свои личные данные!</span><br />
+                            <span id="ctl00_regHolder_1_lblRule5" class="TxtRegualr">В целях безопасности храните такие данные, как ваше настоящее имя, номер телефона, адрес, электронную почту и пароль, в секрете.</span><br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><img src="Media/images/Registration/notice.gif" alt="notice" /></td>
+                        <td><span id="ctl00_regHolder_1_lblRule8" class="CheckBoxTitle">Не общайтесь на темы, запрещённые в мире Могоби!</span><br />
+                            <span id="ctl00_regHolder_1_lblRule9" class="TxtRegualr">При общении запрещено упоминать всё, что связано с наркотиками, алкоголем, использовать высказывания, обижающие любым образом других игроков и говорить на другие не подходящие для детей темы.</span><br />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><img src="Media/images/Registration/notice.gif" alt="notice" /></td>
+                        <td><span id="ctl00_regHolder_1_lblRule10" class="CheckBoxTitle">Играйте честно!</span><br />
+                            <span id="ctl00_regHolder_1_lblRule11" class="TxtRegualr">Запрещено обходить правила игры любым способом (включая программы сторонних разработчиков).</span>
+                        </td>
+                    </tr>
+                </table>
+                
+                
+                
+                
+                
+                
+                
+                
+            </td>
+             <td>
+                <img src="Media/images/tab.gif" width="40" height="1" border="0" alt="" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <img src="Media/images/tab.gif" width="100" height="1" border="0" alt="" />
+            </td>
+            <td>
+                <input type="image" name="ctl00$regHolder_1$btnAgree" id="ctl00_regHolder_1_btnAgree" src="Media/images/Registration/uncheck.gif" border="0" />
+            </td>
+            <td valign="middle" width="100%">
+                &nbsp;<span id="ctl00_regHolder_1_lblAgree" class="SecondaryTitleReg">Я согласен с правилами.</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <img src="Media/images/tab.gif" width="100" height="1" border="0" alt="" />
+            </td>
+            <td>
+                <input type="image" name="ctl00$regHolder_1$btnEmailAgree" id="ctl00_regHolder_1_btnEmailAgree" src="Media/images/Registration/uncheck.gif" border="0" />
+            </td>
+            <td valign="middle" width="100%">
+                &nbsp;<span id="ctl00_regHolder_1_lblRule12" class="TxtRegualr">Я разрешаю посылать новости из мира Могоби на мою электронную почту.</span>
+            </td>
+        </tr>
+    </table>
+    
+    
+
+                                                    </td>
+                                                    <td>
+                                                        <img src="Media/images/tab.gif" width="1" height="414" alt="" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td align="left">
+                                            <br />
+                                            <!-- Disabled by Victor
+                                            <a href="parentLetter.aspx" target="_blank">
+                                                <img src="Media/images/Registration/parents_btn.gif" alt="" id="img_parents" border="0" onmouseover="onOver(this,1)"
+                                                    onmouseout="onOut(this)" /></a>
+                                                    -->
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                        </td>
+                                        <td align="right" valign="top">
+                                            
+    
+
+ <table border="0" cellpadding="0" cellspacing="0" id="Table2">
+        <tr><td><img src='Media/images/Registration/progress_check.gif' /></td></tr><tr><td><img src='Media/images/Registration/progress_check.gif' /></td></tr><tr><td><img src='Media/images/Registration/progress_check.gif' /></td></tr><tr><td><img src='Media/images/Registration/progress_check.gif' /></td></tr><tr><td><img src='Media/images/Registration/progress.gif' /></td></tr><tr><td><img src='Media/images/Registration/progress.gif' /></td></tr>
+        
+</table>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" valign="bottom" colspan="3" >
+                                            <table cellpadding="0" cellspacing="0" border="0"  width="100%">
+                                                <tr>
+                                                    <td align="center">
+                                                        
+    <input type="image" name="ctl00$regHolder_3$btnSubmit" id="ctl00_regHolder_3_btnSubmit" onmouseover="doOverEffect(event)" onmouseout="doOutEffect(event)" src="Media/images/Registration/continuebtn.gif" alt="Continue" border="0" />
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <img src="Media/images/tab.gif" width="1" height="22" alt="" border="0" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+	</tr>
+</table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </center>
+    </form>
+    
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-5490122-7']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<script type="text/javascript">
+function onPageView(page)
+{
+    _gaq.push(['_trackPageview', page]);
+}
+
+function onTrackEvent(category, action)
+{
+    _gaq.push(['_trackEvent', category, action]);
+}
+
+function onSetVar(slot, name, content)
+{
+    _gaq.push(['_setCustomVar',slot,name,content,1]);
+/*    
+pageTracker._setCustomVar(
+      1,                   // This custom var is set to slot #1
+      "Section",           // The top-level name for your online content categories
+      "Life & Style",      // Sets the value of "Section" to "Life & Style" for this particular aricle
+      3                    // Sets the scope to page-level
+   ); 
+*/
+    
+}
+</script>
+
+<script type="text/javascript">
+
+function onSetTranc(orderId,affiliation,amount,shipping,quantity,city,state,country,productName,category)
+{
+    _gaq.push(['_addTrans',
+        orderId,                // Order ID
+        affiliation,             // Affiliation
+        amount,                  // Total
+        "0",                     // Tax
+        shipping,                // Shipping
+        city,                    // City
+        state,                   // State
+        country                  // Country
+     ]);
+    _gaq.push(['_addItem',
+        orderId,                 // Order ID
+        "0",                     // SKU
+        productName,             // Product Name 
+        category,                // Category
+        amount,                  // Price
+        quantity                 // Quantity
+     ]);
+    _gaq.push(['_trackTrans']);
+
+
+
+/*
+    pageTracker._addTrans(
+        orderId,                 // Order ID
+        affiliation,             // Affiliation
+        amount,                  // Total
+        "0",                     // Tax
+        shipping,                // Shipping
+        city,                    // City
+        state,                   // State
+        country                  // Country
+    );
+    pageTracker._addItem(
+        orderId,                 // Order ID
+        "0",                     // SKU
+        productName,             // Product Name 
+        category,                // Category
+        amount,                  // Price
+        quantity                 // Quantity
+    );
+    pageTracker._trackTrans();
+    */
+}
+</script>
+<script>document.write(unescape("%3Cscript src=\'" + (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js\' %3E%3C/script%3E"));</script><script>try{COMSCORE.beacon({c1:2,c2:6035732,c3:"",c4:"http://${env.HTTP_HOST}/${env.QUERY_STRING}",c5:"mogobe",c6:"",c7:"",c15:""});} catch(e){}</script>
+
+</body>
+</html>

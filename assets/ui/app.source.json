@@ -1,0 +1,22 @@
+{
+  "original_game_asset": false,
+  "source_page": "https://web.archive.org/web/20131026180851/http://mogobe.mail.ru/index.aspx",
+  "source_url": "http://mogobe.mail.ru/favicon.ico",
+  "archive_request": "https://web.archive.org/web/20131026180851id_/http://mogobe.mail.ru/favicon.ico",
+  "sha256": "43db6f7e018bf9cd403ec091339ee53a08b5c05df98a962e0c55eb364885aac9",
+  "bytes": 10228,
+  "modified": true,
+  "source": "assets/ui/site-original.ico",
+  "source_sha256": "01a3783a22f087ef8fb9c17838b2f41952b758338670a4b094627a17ecfd11e1",
+  "role": "Original favicon pixels scaled with nearest-neighbor into Windows icon sizes",
+  "sizes": [
+    16,
+    24,
+    32,
+    48,
+    64,
+    128,
+    256
+  ],
+  "generated_by": "tools/prepare_icon.py"
+}

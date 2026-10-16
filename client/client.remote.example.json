@@ -1,0 +1,4 @@
+{
+  "server_url": "https://mogobe.example.com",
+  "request_timeout_seconds": 15
+}

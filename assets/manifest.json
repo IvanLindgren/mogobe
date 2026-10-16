@@ -1,0 +1,426 @@
+[
+  {
+    "path": "room-import.json",
+    "sha256": "e51af4f1147b4ed92dad545b0e430888920197bbdc1f977c34f43c7b38aaab37"
+  },
+  {
+    "path": "sources.json",
+    "sha256": "c3490ade1530e15a58949e3e01dde5a2547958a43554e6fcab859f604d6781ab"
+  },
+  {
+    "path": "registration-assets/20120804071109_tab.gif",
+    "sha256": "89fe0ee6020314794fc2cfeacf3d10c31050cfe56f8ebddf1ed0a33fbe941fa7"
+  },
+  {
+    "path": "registration-assets/20130305114330_MogoStyle.css",
+    "sha256": "a7543aed79ac8bc046d8c59a7b44e2b42f7fce3a98ddc7f62633e1bcc720924f"
+  },
+  {
+    "path": "registration-assets/20130305114330_util.js",
+    "sha256": "5532a4333410d870b251815be4bad2c7d072d6f565e3bde41c58fd9658c75bd3"
+  },
+  {
+    "path": "registration-assets/20130305114332_CleanBG.png",
+    "sha256": "1a420be431fd2f2a590e908a89b132c6a7c187553a66697d9c49172448241fd7"
+  },
+  {
+    "path": "registration-assets/20130308125026_BG_screen.gif",
+    "sha256": "bf96e97daf8e6dfe74ab7fb47a198b000add5a6a3718903454cac9939e2a8948"
+  },
+  {
+    "path": "registration-assets/20130308125026_coins.gif",
+    "sha256": "7177f4cb7bd18d7538399bc07401244be7c5beb825f1f6f72445a5e6119f3d64"
+  },
+  {
+    "path": "registration-assets/20130308125026_parents_btn.gif",
+    "sha256": "00f2b8fec5377fa36e69dae76347e82fd57d9b7bae87f72809b74d5d91efa5a2"
+  },
+  {
+    "path": "registration-assets/20130308125026_parents_down.gif",
+    "sha256": "e99bfd01fd1d6616b9ab1851ce603f54a48b8abf422f9d250800c2866d946c92"
+  },
+  {
+    "path": "registration-assets/20130308125026_parents_over.gif",
+    "sha256": "27e165a70ef53d21fc729250d58be180833c12ef09b039bef63474af02d91617"
+  },
+  {
+    "path": "registration-assets/20130308125027_PlayReg.gif",
+    "sha256": "b73f89d4fc1cf49783e5acfd9b3f56a2e704c2950d1baec9bbb777c1156664a8"
+  },
+  {
+    "path": "registration-assets/20130907073757_AvatarDisplay.swf",
+    "sha256": "8780e9a64fcf182ff2e42d41af266c7624813744edcec6233868f08f9a32e697"
+  },
+  {
+    "path": "registration-assets/20130907073757_progress_check.gif",
+    "sha256": "90716ba19c229ee49ca2c749ad730f798c1a9aaebebda044a4c32b80b7a6da2d"
+  },
+  {
+    "path": "registration-assets/20130907073758_BG_screen03Russian.gif",
+    "sha256": "ee280cdf216885dce52c79a9faf1e3c5c11f2384ed278d8541171757566bcbf1"
+  },
+  {
+    "path": "registration-assets/20130907073759_continuebtn.gif",
+    "sha256": "c280aaca91f815f18bdddcd7a206e5fe4716e88bd26c67220792bb7614e96ebc"
+  },
+  {
+    "path": "registration-assets/20130907073759_progress.gif",
+    "sha256": "b48650788bc471a2c5a2a7b2bedece5c299f909996332c4bf0448f5e91ff459b"
+  },
+  {
+    "path": "registration-pages/ConfirmRegistration.aspx.html",
+    "sha256": "71020e5b6cc05d056f9b6d4fb48bb036e50da0f17416986325399b17458678a1"
+  },
+  {
+    "path": "registration-pages/Registration2.aspx.html",
+    "sha256": "25cd4ea1532fbec44d13dad5e0feceb37bbf62022fda3e2ce5e720cce2c2868f"
+  },
+  {
+    "path": "registration-pages/Registration3.aspx.html",
+    "sha256": "84daa0776345fafe8a57e7bf7a6b427995a88eae3ce179d9b5b63163051ec9b9"
+  },
+  {
+    "path": "registration-pages/Registration4.aspx.html",
+    "sha256": "81f5fd4c820b25a4ef638844ddf9745c76ba1487670e8a9d7b4f4479955e00fe"
+  },
+  {
+    "path": "registration-pages/Registration5.aspx.html",
+    "sha256": "c7530623e6f541c761c4815110d96a33b1985256164f43a2097cd7b6be79ae6b"
+  },
+  {
+    "path": "registration-pages/Registration7.aspx.html",
+    "sha256": "f022af5e227b0dabccca812a727a1280b95c6abb3ccce908cdd1fe1bb2b47691"
+  },
+  {
+    "path": "registration-pages/Registration8.aspx.html",
+    "sha256": "ee976c326ddb6d73a69061cc71c156a0a0096c1cd684ba5acbd6daa4017366fd"
+  },
+  {
+    "path": "servises/lang.xml",
+    "sha256": "01e9ebfee49c268584dc727293c6f17ede79726a40b0621204d1ecf9dbf04008"
+  },
+  {
+    "path": "site/play-20120701.aspx.html",
+    "sha256": "435e614df483c9ec96cc26a00d86b0768c7fe2ceb2257f832ff5071e5490ddac"
+  },
+  {
+    "path": "site/play-20120701.source.json",
+    "sha256": "8b6b0ebe3c546e693d77a784541dce77bdd53833a730123c78f7a41c5d5fc2f7"
+  },
+  {
+    "path": "Swf/Login.swf",
+    "sha256": "196dcd3278cf481da136b9c2b78577c6453e6ad352880835d0ae9910e57e96fb"
+  },
+  {
+    "path": "Swf/Main.swf",
+    "sha256": "6292bff01cae1cfbe578c004d24190f4016bbd3b2f4e39d2cd6e72e08fa4ba91"
+  },
+  {
+    "path": "Swf/Mogo.swf",
+    "sha256": "98576b1f11ef023e1697aa2f7a399a5ec4516b2bc7989d3a3a5bd87a4b314723"
+  },
+  {
+    "path": "Media/images/Registration/AvatarDisplay.swf",
+    "sha256": "8780e9a64fcf182ff2e42d41af266c7624813744edcec6233868f08f9a32e697"
+  },
+  {
+    "path": "Media/images/Registration/AvatarRegColor.swf",
+    "sha256": "a704be991f21cec37986c12748376622ba87387a7f76d82d0b289d63c12962cc"
+  },
+  {
+    "path": "Swf/Apps/BeautySalon.swf",
+    "sha256": "ced15a24fb296d5dd84acf8557059b41e6f1d61129a18d3bc51410a39456c202"
+  },
+  {
+    "path": "Swf/Apps/BulletinBoard.swf",
+    "sha256": "51ce8aa5e121af634a9621811dc68fbeb31ef21d533a4ad2a17d2fc384b56c93"
+  },
+  {
+    "path": "Swf/Assets/AvatarsGR.swf",
+    "sha256": "fb69c6d05e2b6cd56eda9724c10fe2281543e49ce89b3242ad1d0b3229b77196"
+  },
+  {
+    "path": "Swf/Assets/ControlPanel.swf",
+    "sha256": "923147724cb2504daa0c461b291bd99d309a82615720f9b99a23e5dd78505ecf"
+  },
+  {
+    "path": "Swf/Assets/ControlPanelPetSM.swf",
+    "sha256": "044a610bdc83e402ab2f8153a1365af9db864186674ab93acdf8ea5c7d5d82fd"
+  },
+  {
+    "path": "Swf/Assets/Cursers.swf",
+    "sha256": "e209e3aeb2f38407320c331168db3ee69d44c02cd76fdd03d819af6bbd97e431"
+  },
+  {
+    "path": "Swf/Assets/loginGR.swf",
+    "sha256": "9e6839f13cc265d133ccbeec6035630daf74820fccf9f049673edfb7d8f10439"
+  },
+  {
+    "path": "Swf/Assets/ServersScreenGR.swf",
+    "sha256": "d55c0d50fc8d7af78e57446e6b18d5876b976502beb4ad6e39eef7bea1d07eef"
+  },
+  {
+    "path": "Swf/Games/GoldFishing.swf",
+    "sha256": "3b852d995bdc7bbfa10cc5b604e2b246bd6d1a6b25e1c92142d5357234fe43f2"
+  },
+  {
+    "path": "Swf/Rooms/Africa.swf",
+    "sha256": "6d2177628f674ba29142a471b51bf0ae3590d89bb685f28419230ac7f37cd255"
+  },
+  {
+    "path": "Swf/Rooms/Bar.swf",
+    "sha256": "26d04bf0961fc48baf2e3f3f2763d5f3bca4eeffa20ef5cf4c0ff4cbacc5996c"
+  },
+  {
+    "path": "Swf/Rooms/BowlingRoom.swf",
+    "sha256": "622e120c6feba4e8c69f5febbe69130222c7bd88cb7271e6a4f29ebe8e92a4a1"
+  },
+  {
+    "path": "Swf/Rooms/BumagsFoodToysStore.swf",
+    "sha256": "7002211454a48522b3d297eeb508291e9ae9fa230e7ecc362e8023d33680e05b"
+  },
+  {
+    "path": "Swf/Rooms/BumagsPotionStore.swf",
+    "sha256": "10d3a779633c433181885441c551d41540f79f2a93267c0b0399ac33a3cfdcf9"
+  },
+  {
+    "path": "Swf/Rooms/BumagsStore.swf",
+    "sha256": "6d04edba39b67247221edb8e363cec9db60c8334777830205c980e51a17af22d"
+  },
+  {
+    "path": "Swf/Rooms/BumagVale.swf",
+    "sha256": "614973a71683e62fd1b73b8aa1c90126ec323d9f2935f62750c2d9e8bcb375a8"
+  },
+  {
+    "path": "Swf/Rooms/CaeteOrube.swf",
+    "sha256": "72d03a582b820da669a923a6bce2e18ca2ada7ff59d3f89cb4370c31ee8797d8"
+  },
+  {
+    "path": "Swf/Rooms/CastleInnerA.swf",
+    "sha256": "38874a3fcf05738a451105862bdb9056c3e17506cbdf97cbf4399e7e0a6ce6e4"
+  },
+  {
+    "path": "Swf/Rooms/CastleInnerB.swf",
+    "sha256": "71937a7f4eb5d3a53dcfa8fe2712b2edeb5412be6493136defa0031540397b15"
+  },
+  {
+    "path": "Swf/Rooms/CinemaRoom.swf",
+    "sha256": "12ceebffda1f96a83c2267c8fee29d7f50d5962410076317dfe2b42ae14fb053"
+  },
+  {
+    "path": "Swf/Rooms/ClothesStore.swf",
+    "sha256": "16de3176feb382415e3474357e7f45564e2162e582ce3d22c44519e26a35006a"
+  },
+  {
+    "path": "Swf/Rooms/FearCave.swf",
+    "sha256": "64e939843d4a2a3439332e814a4e67ded31479648dc183ec5213d783a971397d"
+  },
+  {
+    "path": "Swf/Rooms/FearCaveGate.swf",
+    "sha256": "041912cc7b3c678247c7692ba421f8b59a49701bbd4f23372968387b1fecb7ab"
+  },
+  {
+    "path": "Swf/Rooms/FightingBomagSchool.swf",
+    "sha256": "38d9efb2802c2d4e8328f8e773ed23015abfa4c67c42938b16e7815997b177c3"
+  },
+  {
+    "path": "Swf/Rooms/FightingBomagSchoolIndoor.swf",
+    "sha256": "922ff9ff702a7a2dece5b907f632eb82c00edc9766cd6c40edcda1671e9eb429"
+  },
+  {
+    "path": "Swf/Rooms/ForestTree.swf",
+    "sha256": "4534b0ffabad31aa357a36881bca9b8e1abadd2f22ae2f52aa1ac29eb77165bb"
+  },
+  {
+    "path": "Swf/Rooms/FurnitureStore.swf",
+    "sha256": "d365fa429a8f7bc09667cd23c7575b018c5eaa33c8e009373cd9162e4658c46e"
+  },
+  {
+    "path": "Swf/Rooms/HallOfFame.swf",
+    "sha256": "e5d89a1e660efa3c5e8c2453b1bf08b30d88fb1ea01df12240e3bffe3c667876"
+  },
+  {
+    "path": "Swf/Rooms/HoopsRoom.swf",
+    "sha256": "ae71ebaaeb834e8a1216e06e261c7e873f81943cd65fc398b0d192d15f83ab0a"
+  },
+  {
+    "path": "Swf/Rooms/Hotel.swf",
+    "sha256": "6358666e84a67b2c6efcc94851e623aae31df4ba3abf0b2eba699082990b843f"
+  },
+  {
+    "path": "Swf/Rooms/InfoBoard.swf",
+    "sha256": "79bc10ec2cca925e562a18270bec447b547741a262a327b49437cf7b034f2b10"
+  },
+  {
+    "path": "Swf/Rooms/Island.swf",
+    "sha256": "a122172759e8890046b93c63caaf215e7c661f9eb630e7e545a7fecb53b27fc4"
+  },
+  {
+    "path": "Swf/Rooms/JewelryExhibition.swf",
+    "sha256": "cc769d037b64d1d43a134a2b15083ff9467f7a7da5ad4ce961862f4d4ebf594a"
+  },
+  {
+    "path": "Swf/Rooms/JewelryStore.swf",
+    "sha256": "26a009380c3c37709865a1b502cd8108f0d43d014c35474cd29f7fa0feb3b45b"
+  },
+  {
+    "path": "Swf/Rooms/KingsRoad.swf",
+    "sha256": "25c8fea080469a705065614de58c64ca6fab5912312c8d212608c6c2f0a63ff7"
+  },
+  {
+    "path": "Swf/Rooms/MagicForest.swf",
+    "sha256": "0a01ad06dda2611053e9890ad8f8339b0aa733df8f62756df67bc3dfdd90bcb6"
+  },
+  {
+    "path": "Swf/Rooms/Mall.swf",
+    "sha256": "e12036e729a9909fe8eee88ae619fb2db751f4d6c5a3bd802c3ed94099e64b3f"
+  },
+  {
+    "path": "Swf/Rooms/maze_entrance.swf",
+    "sha256": "e01a36d8e587f8423790da6132f0fa8880f2846189b87c01edb0813d92af979f"
+  },
+  {
+    "path": "Swf/Rooms/MeetingRoom.swf",
+    "sha256": "e32174e28bb0a6c2c439fff24e012861ddb6efcf6ffff773d429f54b9c467506"
+  },
+  {
+    "path": "Swf/Rooms/Mexico.swf",
+    "sha256": "431bd5399192bf0326993740e2d5c52f7ef8505f0c725ec9c2f2a94767e76a9f"
+  },
+  {
+    "path": "Swf/Rooms/MogoPlay.swf",
+    "sha256": "0549d42596de50b2b3111fc066a53a4d0cdcff0017bae8c7b3962daf39337dda"
+  },
+  {
+    "path": "Swf/Rooms/Novograd.swf",
+    "sha256": "26038377d82b52bf2b7cd9c6964d1482ea3d9b7f430bba1f9427332eb15d8059"
+  },
+  {
+    "path": "Swf/Rooms/OMGzone.swf",
+    "sha256": "f21c353f83f1f462d70504d0b5c026723338e30598e1567a66f36521082a1fa7"
+  },
+  {
+    "path": "Swf/Rooms/PartyRoom_Pirates.swf",
+    "sha256": "c0771ab4f62474aa019d660ee034458a467127e579bed5103960c1c3116312d9"
+  },
+  {
+    "path": "Swf/Rooms/PartyRoom_Reg.swf",
+    "sha256": "242d96ca20bd66ef33c5c3d56f38a53797885ec405ac4b34d38f961681f14aa6"
+  },
+  {
+    "path": "Swf/Rooms/PartyRoom_Sweets.swf",
+    "sha256": "2cdf80b97e8c768b55850af85f7013f245d2170cce9089aace7aac640da3b07a"
+  },
+  {
+    "path": "Swf/Rooms/Pool.swf",
+    "sha256": "9d1f8cbb07e84bef788ba2b01a2fba3f641fa36da5db9ee96aafb6b2e39775d1"
+  },
+  {
+    "path": "Swf/Rooms/Port.swf",
+    "sha256": "d14063126591123065498d5e148759ce50ab4e76e479988dff77fef6c686e912"
+  },
+  {
+    "path": "Swf/Rooms/ProfyMeetingRoom.swf",
+    "sha256": "382e86b45968594aa7ca0362d790747b500119660c3952dab90db4a15f2d3f40"
+  },
+  {
+    "path": "Swf/Rooms/ProfyQuiz.swf",
+    "sha256": "1de219a5fc4262905207e7644ee08bb147f4b1043f24aa14b56470772300247c"
+  },
+  {
+    "path": "Swf/Rooms/ProfyRoom.swf",
+    "sha256": "fdf01ce17d59da06d2728e9eb5d92e27d6ddebdc2ba0f6cb35a523b731956ab3"
+  },
+  {
+    "path": "Swf/Rooms/Severburg.swf",
+    "sha256": "fa3a8832e865ea9c3b04260c7167420e92494f843049a9edb194316ff9cc7bfc"
+  },
+  {
+    "path": "Swf/Rooms/Ship.swf",
+    "sha256": "80d745d50fcb2910d3416379ac3dec30c3f0056b21edbda699d2568257574fc6"
+  },
+  {
+    "path": "Swf/Rooms/Skazkino.swf",
+    "sha256": "588f83d1b7f13d10aa8061e2e91ae1787bbd6a4a95fe5f549c3599349c6f29c2"
+  },
+  {
+    "path": "Swf/Rooms/Spa.swf",
+    "sha256": "67c21680590f0c53a9ba550710bd4d494ccda4ea27962f59322e7a30916feef4"
+  },
+  {
+    "path": "Swf/Rooms/SpaceshipBridge.swf",
+    "sha256": "5a6ddd4c0276d7d53614147e02313b1e51c9838c77644c67c8355eb3ca40e36c"
+  },
+  {
+    "path": "Swf/Rooms/SportStore.swf",
+    "sha256": "811482fbd636c4b9c22fe13a9b88f5f4071ecf868423a9285841ec64d951b54f"
+  },
+  {
+    "path": "Swf/Rooms/Submarine.swf",
+    "sha256": "4f02831f0a2bbc57e8f5ac0959f163cf933a601a21cd833ff0ab5a83ea835200"
+  },
+  {
+    "path": "Swf/Rooms/SummerCamp.swf",
+    "sha256": "e0252a5b2c78b0dd0c7c3747c6b0ebc6acce872fd8cdcb38706dd0ed46d30532"
+  },
+  {
+    "path": "Swf/Rooms/Sunandsea.swf",
+    "sha256": "7fe8275cd5e6172d6a426462ff82a7af9b060f824629d41ac74866fb7e6a352f"
+  },
+  {
+    "path": "Swf/Rooms/Vugovo.swf",
+    "sha256": "134d94cebd8e2edcb74ceb6df5f0aa2723a985b734f535fd83d69142155e7367"
+  },
+  {
+    "path": "Swf/Assets/Popups/BeMember.swf",
+    "sha256": "8911fecccf390dc27f077ac4ed903d2e67aed4fd3059e518ebe3b6bffaad4106"
+  },
+  {
+    "path": "Swf/Assets/Popups/FriendsList.swf",
+    "sha256": "ace73045a409bff487369b39fb08cccb14cd9c156526312e878c9e1613451d6a"
+  },
+  {
+    "path": "Swf/Assets/Popups/MyProfile.swf",
+    "sha256": "a21ed523fc0fd5d337a18b7744d5649234e9aa21ac3c85e3c43969752e0f6c5c"
+  },
+  {
+    "path": "Swf/Assets/Popups/PlayerProfile.swf",
+    "sha256": "ab55a53a91e7a60429550b1cb6035614c0224723fe9f6dacfef07ba047ea6a22"
+  },
+  {
+    "path": "Swf/Assets/Popups/Popups.swf",
+    "sha256": "c9ea1e34cb38f842dbcdcad213308a9b42c10b740a9149ac018bc76e36e3bc4d"
+  },
+  {
+    "path": "Swf/Assets/Popups/RegistrationPopups.source.json",
+    "sha256": "a660f8988585b35330f81e35f27521ffb3967cc570ab92de0650014a68892b0c"
+  },
+  {
+    "path": "Swf/Assets/Popups/RegistrationPopups.swf",
+    "sha256": "508075c4db1f72b57dce2067ffd7e87dd35248d1f0daad15247beff78ccc87a7"
+  },
+  {
+    "path": "Swf/Assets/Popups/WorldMap.swf",
+    "sha256": "4fe49a794332181147c3397bae83323d9ae508e50f816a62a83c2d3d6e41e0c0"
+  },
+  {
+    "path": "Swf/Assets/Popups/WorldMapRussian.swf",
+    "sha256": "0f930e6fec68ad93929ec23f86a5d3b621d436fc06f9b5dc451abbb69d510f99"
+  },
+  {
+    "path": "Swf/Rooms/Preserved/FearCaveGate_b8dfa2fb.swf",
+    "sha256": "b8dfa2fbb303812bb88b9ee8fefa30e45347be145fc77fea5f0acfc82602f034"
+  },
+  {
+    "path": "Swf/Rooms/Preserved/InfoBoard_2012.swf",
+    "sha256": "06094094ab64213f143308553e32cad22fb3aefd4378d1bcf4075ee36363584a"
+  },
+  {
+    "path": "Swf/Rooms/Preserved/Novograd_2012.swf",
+    "sha256": "8e3c088d652deebbc562597eac09fcddd0f164b1e9c933beb80434fd00963e02"
+  },
+  {
+    "path": "Xmls/lang/chat_5.xml",
+    "sha256": "19b69014f729cdb7956e1273355541a6b2ee454c3b49819d1f4da2eec59d1fea"
+  }
+]

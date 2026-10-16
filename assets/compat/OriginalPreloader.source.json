@@ -1,0 +1,28 @@
+{
+  "original_game_asset": false,
+  "role": "Original mlPreLoader graphics and animated timelines extracted without redrawing",
+  "source": "assets/original/Swf/Mogo.swf",
+  "source_sha256": "98576b1f11ef023e1697aa2f7a399a5ec4516b2bc7989d3a3a5bd87a4b314723",
+  "sha256": "54a748b0f3c98b6a2df967b34b150a9db808292aa4ccf5f6d9633db52de80b83",
+  "symbol": "mlPreLoader",
+  "sprite_id": 13,
+  "sprites": [
+    [
+      2,
+      1
+    ],
+    [
+      11,
+      22
+    ],
+    [
+      12,
+      1
+    ],
+    [
+      13,
+      1
+    ]
+  ],
+  "generated_by": "tools/extract_original_preloader.py"
+}

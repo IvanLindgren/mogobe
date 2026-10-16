@@ -1,0 +1,12 @@
+{
+  "url": "https://web.archive.org/web/20120701025625/http://www.mogobe.ru/play.aspx",
+  "sha256": "435e614df483c9ec96cc26a00d86b0768c7fe2ceb2257f832ff5071e5490ddac",
+  "background": "Media/images/CleanBG.png",
+  "frame": {
+    "border_width": 10,
+    "border_color": "#FFFFFF",
+    "shadow_offset": 10,
+    "shadow_color": "#5C7D08"
+  },
+  "note": "Preserved archived HTML for reference only; scripts are not executed by the client."
+}

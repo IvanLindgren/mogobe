@@ -1,0 +1,402 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html  xmlns="http://www.w3.org/1999/xhtml" >
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description"  content="Играть в Мир Могоби. Войти в Мир могоби." />
+
+    <script src="/JS/util.js" language="javascript" type="text/javascript" ></script>
+    <script src="/JS/WinSize.js" language="javascript" type="text/javascript" ></script>
+     
+    <style type="text/css">
+        html, body, #wrapper
+        {
+            margin: 0;
+            padding: 0;
+            border: none;
+            text-align: center;
+        }
+        #wrapper
+        {
+            margin: 0 auto;
+            text-align: left;
+            vertical-align: middle;
+            width: 100%;
+        }
+        #page
+        {
+            margin: 0 auto;
+            width: 770px;
+        }
+    </style>
+    
+<link href="/css/MogoStyle.css" rel="stylesheet" type="text/css" />
+<script language="javascript" type="text/javascript">
+
+function setpagesize()
+{
+    setW("page");
+    setW("pageContent");
+}
+
+window.onload = function()
+{
+    setpagesize()
+}
+
+window.Alert = function(text)
+{
+    var opt = "dialogWidth:350px;dialogTop:300px;dialogLeft:300;dialogHeight:230px;scroll:no; status:off";
+    var obj = new Object();
+    obj.text = text;
+    window.showModalDialog("MessageBox.aspx",obj,opt);
+}
+
+</script>
+
+<title>
+	Могоби - онлайн мир для детей, полный захватывающих приключений.
+</title></head>
+<body id="ctl00_mainBody" background="/Media/images/CleanBG.png">
+    <table border="0" cellpadding="0" cellspacing="0" id="wrapper" width="100%">
+        <tr>
+            <td width="20%" background="/Media/images/GameMenu/sargelpattern.gif">&nbsp;</td>
+            <td valign="top" id="page">
+                
+   
+    
+<style type="text/css">
+.link, .link:link, .link:visited, .link:active
+{
+    color: #FFFFFF;
+    font-size: 11pt;
+    font-family:Arial;
+    cursor:pointer; 
+    cursor:hand;
+    text-decoration:none;
+}
+
+.link:hover
+{
+    color: #74891F;
+    font-size: 11pt;
+    font-family:Arial;
+    cursor:pointer; 
+    cursor:hand;
+    text-decoration:none;
+}
+
+</style>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" background="/Media/images/GameMenu/sargelpattern.gif">
+    <tr>
+        <td align="left">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td width="10"><img src="/Media/images/tab.gif" width="10" height="29" alt=""/></td>
+
+                    <td><a href="/index.aspx" style="text-decoration:none" target="_top">
+                    <span id="ctl00_menu_txtHome" class="link">Главная страница</span></a>
+                    </td>
+                    
+                    <div id="ctl00_menu_plnContactUs">
+	
+                        <td width="12" align="center"><img src="/Media/images/GameMenu/separator.gif" alt="" /></td>
+                        <td><a href="/Contactus.aspx" style="text-decoration:none" target="_top">
+                        <span id="ctl00_menu_lblContactUs" class="link">Связаться с нами</span></a></td>
+                    
+</div>
+
+                    
+            
+
+                    <div id="ctl00_menu_plnSupport">
+	
+                        <td width="12" align="center"><img src="/Media/images/GameMenu/separator.gif" alt="" /></td>
+                        <td><a href="/support/index.aspx" style="text-decoration:none" target="_top">
+                        <span id="ctl00_menu_lblHelp" class="link">Помощь</span></a></td>
+                    
+</div>
+
+                    
+<!--
+                    <div id="ctl00_menu_plnAcountMengmnet">
+	
+                        <td width="12" align="center"><img src="/Media/images/GameMenu/separator.gif" alt="" /></td>
+                        <td><a href="/MyAccount.aspx" style="text-decoration:none" target="_top">
+                        <span id="ctl00_menu_lblMyAccount" class="link">Мои настройки</span>
+                        </a></td>
+                    
+</div>
+-->
+                    
+                    <div id="ctl00_menu_plnBlog">
+	
+                        <td width="12" align="center"><img src="/Media/images/GameMenu/separator.gif" alt="" /></td>
+                        <td><a href="/Blog.aspx" style="text-decoration:none" target="_top">
+                        <span id="ctl00_menu_lblBlog" class="link">Новости</span></a></td>
+                    
+</div>
+                </tr>
+            </table>
+        </td>
+        <td align="right">
+            <div id="ctl00_menu_plnShowRelogin">
+	
+            <a href="javascript:window.location.reload()"  class="link" target="_top">
+            <span id="ctl00_menu_lblLogOff" class="link">Выйти из игры</span></a>
+            
+</div>
+            
+            
+        </td>
+        <td width="10"><img src="/Media/images/tab.gif" width="10" height="29" alt=""/></td>
+    </tr>
+</table>
+            </td>
+            <td width="20%" background="/Media/images/GameMenu/sargelpattern.gif">&nbsp;</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td valign="top" align="center" id="pageContent">
+                
+                
+<br />
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        
+        <td><img src="Media/images/tab.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#FFFFFF"><img src="Media/images/World/white.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#FFFFFF"><img src="Media/images/World/white.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#FFFFFF"><img src="Media/images/World/white.gif" width="10" height="10" border="0" alt=""/></td>
+        <td><img src="Media/images/tab.gif" width="10" height="10" border=0 alt=""/></td>
+    </tr>
+    <tr>
+        <td><img src="Media/images/tab.gif" width="10" height="10" border=0 alt=""/></td>
+        <td bgcolor="#FFFFFF"><img src="Media/images/World/white.gif" width="10" height="10" border="0" alt=""/></td>
+        <td>
+        
+        <div id="ctl00_ContentPlaceHolder1_plnGame">
+	
+
+<script language="javascript" type="text/javascript">
+AC_FL_RunContent = 0;
+DetectFlashVer = 0; 
+appParam = 'appVer=20122406&Lang=5&serverList=true&debug=false&httpPort=9339&mainDomain=www.mogobe.ru&mediaURL=&blueBoxPort=80&blueBoxIP=95.142.17.110';
+loginSfw = '/Swf/Mogo';
+//loginSfw = '/Swf/Login';
+
+
+</script>
+<script src="/JS/AC_RunActiveContent.js" language="javascript" type="text/javascript"></script>
+<script src="/JS/play.js?ver=20122406" language="javascript" type="text/javascript"></script>
+<script language="javascript"  type="text/javascript">
+
+// -----------------------------------------------------------------------------
+// Globals
+// Major version of Flash required
+var requiredMajorVersion = 10;
+// Minor version of Flash required
+var requiredMinorVersion = 0;
+// Revision of Flash required
+var requiredRevision = 0;
+
+
+
+// -----------------------------------------------------------------------------
+var hasRightVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);     
+if (AC_FL_RunContent == 0 || DetectFlashVer == 0)
+{
+	alert("This page requires AC_RunActiveContent.js.");
+} 
+else
+{
+	
+	if(hasRightVersion) {  // if we've detected an acceptable version
+		// embed the flash movie
+		AC_FL_RunContent(
+			'codebase', 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,115,0',
+			'width', swfProperties.width,
+			'height', swfProperties.height,
+			'src', '/Swf/Login',
+			'quality', 'high',
+			'pluginspage', 'http://www.macromedia.com/go/getflashplayer',
+			'align', 'middle',
+			'play', 'true',
+			'loop', 'true',
+			'scale', 'showall',
+			'wmode', 'window',
+			'devicefont', 'true',
+			'id', 'Main',
+			'bgcolor', '#0196ba',
+			'name', 'Main',
+			'menu', 'false',
+			'allowScriptAccess','always',
+			'allowFullScreen','true',
+			'movie', loginSfw,
+			'salign', ''
+			); //end AC code
+}
+else
+{
+	// flash is too old or we can't detect the plugin
+	var alternateContent = '<br><br><br><div dir=rtl>'
+                            + 'כדי לשחק בעולם של מוגובי עליך להתקין את הגרסא האחרונה של Adobe Flash Player (גרסא '
+                            + requiredMajorVersion + '.' + requiredMinorVersion + '.' + requiredRevision
+                            + ').<br> לחץ '
+							+ ' <a href=http://www.macromedia.com/go/getflash/>כאן</a> '
+                            + 'להורדה.'
+                            + '</div><br><br>'
+                            + 'To enjoy the world of Mogobe you must install the latest version of Adobe\'s Flash Player (Version '
+                            + requiredMajorVersion + '.' + requiredMinorVersion + '.' + requiredRevision
+                            + ').<br> Click '
+							+ ' <a href=http://www.macromedia.com/go/getflash/>here</a> '
+                            + 'to download'
+							+ '<br><br><br><br>';
+	document.write(alternateContent);  // insert non-flash content
+	}
+}
+setSWFProperties();
+</script>
+        
+        
+
+
+</div>
+
+
+
+        </td>
+        <td bgcolor="#FFFFFF"><img src="Media/images/World/white.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#5C7D08"><img src="Media/images/World/green.gif" width="10" height="10" border="0" alt=""/></td>
+    </tr>
+    <tr>
+        <td><img src="Media/images/tab.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#FFFFFF"><img src="Media/images/World/white.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#FFFFFF"><img src="Media/images/World/white.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#FFFFFF"><img src="Media/images/World/white.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#5C7D08"><img src="Media/images/World/green.gif" width="10" height="10" border="0" alt=""/></td>
+    </tr>
+
+    <tr>
+        <td><img src="Media/images/tab.gif" width="10" height="10" border="0" alt=""/></td>
+        <td><img src="Media/images/tab.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#5C7D08"><img src="Media/images/World/green.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#5C7D08"><img src="Media/images/World/green.gif" width="10" height="10" border="0" alt=""/></td>
+        <td bgcolor="#5C7D08"><img src="Media/images/World/green.gif" width="10" height="10" border="0" alt=""/></td>
+    </tr>
+</table>
+
+
+<script language="javascript" type="text/javascript">
+setWidth("Main",40)
+window.onresize = function()
+{ 
+    setSWFProperties();
+    setWidth("Main",40);
+} 
+</script>
+
+
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-5490122-7']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<script type="text/javascript">
+function onPageView(page)
+{
+    _gaq.push(['_trackPageview', page]);
+}
+
+function onTrackEvent(category, action)
+{
+    _gaq.push(['_trackEvent', category, action]);
+}
+
+function onSetVar(slot, name, content)
+{
+    _gaq.push(['_setCustomVar',slot,name,content,1]);
+/*    
+pageTracker._setCustomVar(
+      1,                   // This custom var is set to slot #1
+      "Section",           // The top-level name for your online content categories
+      "Life & Style",      // Sets the value of "Section" to "Life & Style" for this particular aricle
+      3                    // Sets the scope to page-level
+   ); 
+*/
+    
+}
+</script>
+
+<script type="text/javascript">
+
+function onSetTranc(orderId,affiliation,amount,shipping,quantity,city,state,country,productName,category)
+{
+    _gaq.push(['_addTrans',
+        orderId,                // Order ID
+        affiliation,             // Affiliation
+        amount,                  // Total
+        "0",                     // Tax
+        shipping,                // Shipping
+        city,                    // City
+        state,                   // State
+        country                  // Country
+     ]);
+    _gaq.push(['_addItem',
+        orderId,                 // Order ID
+        "0",                     // SKU
+        productName,             // Product Name 
+        category,                // Category
+        amount,                  // Price
+        quantity                 // Quantity
+     ]);
+    _gaq.push(['_trackTrans']);
+
+
+
+/*
+    pageTracker._addTrans(
+        orderId,                 // Order ID
+        affiliation,             // Affiliation
+        amount,                  // Total
+        "0",                     // Tax
+        shipping,                // Shipping
+        city,                    // City
+        state,                   // State
+        country                  // Country
+    );
+    pageTracker._addItem(
+        orderId,                 // Order ID
+        "0",                     // SKU
+        productName,             // Product Name 
+        category,                // Category
+        amount,                  // Price
+        quantity                 // Quantity
+    );
+    pageTracker._trackTrans();
+    */
+}
+</script>
+<script>document.write(unescape("%3Cscript src=\'" + (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js\' %3E%3C/script%3E"));</script><script>try{COMSCORE.beacon({c1:2,c2:6035732,c3:"",c4:"http://${env.HTTP_HOST}/${env.QUERY_STRING}",c5:"mogobe",c6:"",c7:"",c15:""});} catch(e){}</script>
+
+</body>
+</html>

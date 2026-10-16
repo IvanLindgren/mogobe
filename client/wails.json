@@ -1,0 +1,11 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "Mogobe",
+  "outputfilename": "Mogobe",
+  "frontend:dir": "frontend",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
+  "author": {"name": "Mogobe restoration"},
+  "info": {"productName": "Mogobe", "productVersion": "0.1.0", "comments": "Original Russian SWF client"}
+}
