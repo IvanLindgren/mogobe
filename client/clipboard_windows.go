@@ -36,10 +36,18 @@ func avatarDIB(picture image.Image) []byte {
 func copyAvatarImage(picture image.Image) error {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
+	// A message-only owner is needed: EmptyClipboard with a NULL owner
+	// prevents SetClipboardData from transferring ownership on Windows.
+	name, _ := windows.UTF16PtrFromString("STATIC")
+	hwnd, _, err := clipboardUser32.NewProc("CreateWindowExW").Call(0, uintptr(unsafe.Pointer(name)), 0, 0, 0, 0, 0, 0, ^uintptr(2), 0, 0, 0)
+	if hwnd == 0 {
+		return err
+	}
+	defer clipboardUser32.NewProc("DestroyWindow").Call(hwnd)
 	open := clipboardUser32.NewProc("OpenClipboard")
 	var opened uintptr
 	for i := 0; i < 20; i++ {
-		opened, _, _ = open.Call(0)
+		opened, _, _ = open.Call(hwnd)
 		if opened != 0 {
 			break
 		}

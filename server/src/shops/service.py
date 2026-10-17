@@ -15,7 +15,7 @@ def asset_index():
     data = json.loads(
         (ROOT.parent / "assets/catalogs/shop-assets.json").read_text(encoding="utf-8")
     )
-    return {r["id"]: r for r in data["items"] if "display" in r}
+    return {r["id"]: r for r in data["items"] if "display" in r or "walking" in r}
 
 
 @lru_cache
@@ -33,7 +33,7 @@ def check_category_icon(ident):
 
 def check_asset(ident, needs_animation=False):
     row = asset_index().get(ident)
-    if not row or (needs_animation and "standing" not in row):
+    if not row or (needs_animation and not ("standing" in row or "walking" in row)):
         raise HTTPException(422, "Нет подходящей графики предмета: " + str(ident))
 
 
@@ -78,7 +78,7 @@ async def inventory(db, account_id, main_type=None):
         .join(Item, Item.id == OwnedItem.item_id)
         .where(OwnedItem.account_id == account_id)
     )
-    if main_type in (1, 2):
+    if main_type is not None:
         query = query.where(Item.main_type == main_type)
     return [legacy_item(item, owned.id) for owned, item in (await db.execute(query)).all()]
 

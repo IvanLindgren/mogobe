@@ -41,6 +41,7 @@ def main():
         with (OUT / "backend.log").open("w", encoding="utf-8") as backend_log, (OUT / "client.log").open("w", encoding="utf-8") as client_log:
             try:
                 env = os.environ.copy()
+                env["MOGOBE_BOOTSTRAP_DEFAULTS"]="false"
                 env["MOGOBE_DATABASE_URL"] = "sqlite+aiosqlite:///" + database.as_posix()
                 env["PYTHONPATH"] = str(ROOT / "server/.venv/Lib/site-packages")
                 env["MOGOBE_UI_TEST_SECRET"] = secrets.token_urlsafe(32)

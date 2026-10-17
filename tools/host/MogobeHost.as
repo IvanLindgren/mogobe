@@ -52,6 +52,12 @@ package {
         private var popupWindow:MovieClip;
         private var popupText:TextField;
         private var popupFont:Object;
+        private var popupBackground:Sprite;
+        private var popupBackgroundBounds:Rectangle;
+        private var popupTextBounds:Rectangle;
+        private var popupTextFormat:TextFormat;
+        private var popupButtonY:Number;
+
         private var worldLoginInfo:Object;
         private var worldStarting:Boolean = false;
         private var hookedServers:DisplayObjectContainer;
@@ -80,6 +86,7 @@ package {
             gameLoader.addEventListener(MouseEvent.CLICK, avatarCameraClick, true, 300);
             gameLoader.addEventListener(MouseEvent.MOUSE_OVER, friendMouseOver, true, 200);
             gameLoader.addEventListener(MouseEvent.MOUSE_OUT, friendMouseOut, true, 200);
+            gameLoader.addEventListener(MouseEvent.MOUSE_WHEEL, shopCategoryWheel, true, 200);
             addChild(gameLoader);
             originalPreloader = new Loader();
             originalPreloader.mouseEnabled = false;
@@ -99,6 +106,7 @@ package {
             ExternalInterface.addCallback("setServerPresence", setServerPresence);
             ExternalInterface.addCallback("getServerInfo", getServerInfo);
             ExternalInterface.addCallback("getProfileInfo", getProfileInfo);
+            ExternalInterface.addCallback("getInventoryInfo", getInventoryInfo);
             ExternalInterface.addCallback("setProfileProgress", setProfileProgress);
             ExternalInterface.addCallback("getExperienceInfo", getExperienceInfo);
             ExternalInterface.addCallback("openOriginalShop",openOriginalShop);
@@ -106,6 +114,9 @@ package {
             ExternalInterface.addCallback("finishShopPurchase",finishShopPurchase);
             ExternalInterface.addCallback("closeOriginalShop",closeOriginalShop);
             ExternalInterface.addCallback("getShopInfo",getShopInfo);
+            ExternalInterface.addCallback("setWorldShopPoints",setWorldShopPoints);
+            ExternalInterface.addCallback("getWorldShopPoints",getWorldShopPoints);
+            ExternalInterface.addCallback("getWorldShopState",getWorldShopState);
             ExternalInterface.addCallback("getWorldPanelInfo", getWorldPanelInfo);
             ExternalInterface.addCallback("getWorldMapInfo", getWorldMapInfo);
             ExternalInterface.addCallback("getChatMenuItems", getChatMenuItems);
@@ -127,6 +138,7 @@ package {
         private function loadRegistrationPopup():void {
             ExternalInterface.addCallback("showMessage", showMessage);
             ExternalInterface.addCallback("getPopupControlBounds", getPopupControlBounds);
+            ExternalInterface.addCallback("getMessageInfo", getMessageInfo);
             gameLoader = new Loader();
             gameLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, popupFontsLoaded);
             gameLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, popupLoadFailed);
@@ -160,6 +172,17 @@ package {
             popupWindow.y = 240 - bounds.y - bounds.height / 2;
             popupText = popupFont.addText(Object(popupWindow).txtMessage, "", 420) as TextField;
             Object(popupWindow).txtMessage = popupText;
+            popupTextBounds = new Rectangle(popupText.x,popupText.y,popupText.width,popupText.height);
+            popupTextFormat = popupText.defaultTextFormat;
+            // Reuse the original frame artwork, with fixed corners for a taller help panel.
+            var artwork:DisplayObject = popupWindow.getChildAt(0);
+            popupBackgroundBounds = artwork.getBounds(popupWindow);
+            popupWindow.removeChild(artwork);
+            popupBackground = new Sprite();
+            popupBackground.addChild(artwork);
+            popupBackground.scale9Grid = new Rectangle(popupBackgroundBounds.x+12,popupBackgroundBounds.y+12,popupBackgroundBounds.width-24,popupBackgroundBounds.height-24);
+            popupWindow.addChildAt(popupBackground,0);
+            popupButtonY = Object(popupWindow).btnConfirm.y;
             var button:MovieClip = Object(popupWindow).btnConfirm as MovieClip;
             button.gotoAndStop("OUT");
             button.buttonMode = true;
@@ -187,11 +210,35 @@ package {
             ExternalInterface.call("onMogobePopupClosed");
         }
 
-        public function showMessage(message:String):void {
+        public function showMessage(message:String, commands:Boolean = false):void {
             if (popupText == null) return;
+            var format:TextFormat = commands ? new TextFormat(popupTextFormat.font,14,popupTextFormat.color) : popupTextFormat;
+            if (commands) {format.align = TextFormatAlign.LEFT;format.leading=3;}
+            popupText.autoSize = commands ? "left" : "center";
+            popupText.defaultTextFormat = format;
+            popupText.width = popupTextBounds.width-(commands ? 16 : 0);
             popupText.text = message;
+            popupText.setTextFormat(format);
+            popupText.x = popupTextBounds.x;
+            popupText.y = popupTextBounds.y;
+            var extra:Number = Math.max(0,popupText.height-popupTextBounds.height)+(commands ? 8 : 0);
+            popupBackground.height = popupBackgroundBounds.height+extra;
+            popupBackground.y += popupBackgroundBounds.y-popupBackground.getBounds(popupWindow).y;
+            Object(popupWindow).btnConfirm.y = popupButtonY+extra;
+            var bounds:Rectangle = popupWindow.getBounds(popupWindow);
+            popupWindow.x = 384-bounds.x-bounds.width/2;
+            popupWindow.y = 240-bounds.y-bounds.height/2;
             popupWindow.focusRect = false;
             stage.focus = popupWindow;
+        }
+
+        public function getMessageInfo():Object {
+            if(popupText==null)return null;
+            var text:Rectangle=popupText.getBounds(this);
+            var button:Rectangle=Object(popupWindow).btnConfirm.getBounds(this);
+            var panel:Rectangle=popupWindow.getBounds(this);
+            return {text:popupText.text,textBottom:text.bottom,textRight:text.right,buttonTop:button.top,buttonLeft:button.left,lines:popupText.numLines,
+                panel:{x:panel.x,y:panel.y,width:panel.width,height:panel.height}};
         }
 
         public function getPopupControlBounds(name:String):Object {
@@ -304,7 +351,8 @@ package {
                 var balloon:DisplayObject = (avatar as DisplayObjectContainer).getChildByName("speakBallon");
                 var text:String = "";
                 if (balloon != null) text = collectText(balloon);
-                result.push({id:int(avatar.name), x:avatar.x, y:avatar.y, colorId:Object(avatar).Color, action:Object(avatar).currentAction, me:avatar == worldAvatar, speech:text,
+                var clothing:Array=[]; collectOutfitClips(avatar,clothing);
+                result.push({clothing:clothing,id:int(avatar.name), x:avatar.x, y:avatar.y, colorId:Object(avatar).Color, action:Object(avatar).currentAction, me:avatar == worldAvatar, speech:text,
                     balloonType:balloon == null ? "" : getQualifiedClassName(balloon),
                     balloonLabel:balloon is MovieClip ? MovieClip(balloon).currentLabel : "",
                     balloonChildren:balloon is DisplayObjectContainer ? childTypes(balloon as DisplayObjectContainer) : []});
@@ -375,11 +423,11 @@ package {
             if (mainClip == null) return null;
             var managerClass:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.view.popups.PopupsManeger") as Class;
             var popup:Object = Object(managerClass).getInstance().CurrentPopup;
-            if (popup != null && popup.baseView.stage != null && socialPopupStack.indexOf(popup) == -1) socialPopupStack.push(popup);
+            if (popup != null && popup.baseView != null && popup.baseView.stage != null && socialPopupStack.indexOf(popup) == -1) socialPopupStack.push(popup);
             for (var i:int = socialPopupStack.length-1; i >= 0; i--) {
-                if (socialPopupStack[i].baseView.stage == null) socialPopupStack.splice(i,1);
+                if (socialPopupStack[i].baseView == null || socialPopupStack[i].baseView.stage == null) socialPopupStack.splice(i,1);
             }
-            if (popup != null && popup.baseView.stage != null) return popup;
+            if (popup != null && popup.baseView != null && popup.baseView.stage != null) return popup;
             return socialPopupStack.length == 0 ? null : socialPopupStack[socialPopupStack.length-1];
         }
 
@@ -882,6 +930,35 @@ package {
             return {x:bounds.x, y:bounds.y, width:bounds.width, height:bounds.height};
         }
 
+        private function collectOutfitClips(node:DisplayObject, result:Array):void {
+            var type:String=getQualifiedClassName(node);
+            if (type.indexOf("mlIconSItem")==0 || type.indexOf("mlIconWItem")==0 || type.indexOf("mlBigItem")==0) {
+                var bounds:Rectangle=node.getBounds(this);
+                result.push({type:type,frame:node is MovieClip?MovieClip(node).currentFrame:0,label:node is MovieClip?MovieClip(node).currentLabel:"",x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height});
+                return;
+            }
+            var holder:DisplayObjectContainer=node as DisplayObjectContainer;
+            for(var i:int=0;holder!=null && i<holder.numChildren;i++) collectOutfitClips(holder.getChildAt(i),result);
+        }
+
+        public function getInventoryInfo():Object {
+            var popup:Object=currentProfile();
+            if(popup==null)return null;
+            var cells:Array=[]; collectInventoryCells(popup.baseView,cells);
+            var clothing:Array=[];collectOutfitClips(popup.baseView,clothing);
+            return {cells:cells,clothing:clothing};
+        }
+
+        private function collectInventoryCells(node:DisplayObject,cells:Array):void {
+            if(getQualifiedClassName(node)=="worlds4u.common.uiControls.DataGrid::GridCell") {
+                var data:Object=Object(node).Data;
+                var bounds:Rectangle=node.getBounds(this);
+                cells.push({id:data.ID,typeId:data.TypeId,x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height});return;
+            }
+            var holder:DisplayObjectContainer=node as DisplayObjectContainer;
+            for(var i:int=0;holder!=null && i<holder.numChildren;i++)collectInventoryCells(holder.getChildAt(i),cells);
+        }
+
         private function avatarCameraClick(event:MouseEvent):void {
             var popup:Object = currentProfile();
             if (popup == null || popup.PopupId != 7) return;
@@ -939,7 +1016,13 @@ package {
                 scoreSignsShown++;
                 lastScoreSign = collectText(view);
             }
-            if (view is DisplayObjectContainer && getQualifiedClassName(view) == "mlPopup_33") prepareShopLayout(view as DisplayObjectContainer);
+            if (view is DisplayObjectContainer && getQualifiedClassName(view) == "mlPopup_33") {
+                shopWindowsCreated++;
+                prepareShopLayout(view as DisplayObjectContainer);
+                // The original direct hit path can also run when already standing
+                // at a shop. Keep its legacy window hidden until catalog adaptation.
+                if (shopData == null && originalShopPointAtAvatar() != null) view.visible=false;
+            }
             if (view != null && getQualifiedClassName(view) == "mlPopup_3") {
                 // Hold the original popup before its first paint until the
                 // cached island/button have been attached in this same frame.
@@ -972,7 +1055,10 @@ package {
             refreshFriendsFonts();
             updateProfileCounters();
             updateWorldPanel();
+            watchOriginalShop();
             updateShopLayout();
+            var profile:Object = currentProfile();
+            if (profile != null) preserveGridDecorations(profile.baseView);
             updateWorldMap();
         }
 
@@ -1096,7 +1182,130 @@ package {
 
         private function updateShopLayout():void {
             var popup:Object = currentPopup();
-            if (popup != null && getQualifiedClassName(popup.baseView) == "mlPopup_33") prepareShopLayout(popup.baseView);
+            if (popup == null || getQualifiedClassName(popup.baseView) != "mlPopup_33") return;
+            prepareShopLayout(popup.baseView);
+            preserveGridDecorations(popup.baseView);
+            var categories:Array = [];
+            collectShopCategories(popup.baseView,categories);
+            for each (var tab:DisplayObject in categories) {
+                var strip:DisplayObjectContainer = tab.parent;
+                strip.y = 0;
+                var grid:DisplayObjectContainer = strip.parent;
+                for (var n:int = 0; n < grid.numChildren; n++) {
+                    var control:DisplayObject = grid.getChildAt(n);
+                    if (getQualifiedClassName(control) == "fl.controls::ScrollBar") {
+                        control.visible = false;
+                        Object(control).enabled = false;
+                        DisplayObjectContainer(control).mouseChildren = false;
+                        flash.display.InteractiveObject(control).mouseEnabled = false;
+                    }
+                }
+            }
+            if (categories.length > 6) {
+                // Retain the original buttons and hit handlers; fit extra tabs
+                // into the authored six-column strip instead of a clipped row.
+                var scale:Number = 6 / categories.length;
+                for (var i:int = 0; i < categories.length; i++) {
+                    var cell:DisplayObject = categories[i] as DisplayObject;
+                    cell.scaleX = cell.scaleY = scale;
+                    cell.x = i * 50 * scale;
+                    cell.y = (50 - 50 * scale) / 2;
+                    var siblings:DisplayObjectContainer = cell.parent;
+                    for (var j:int = 0; j < siblings.numChildren; j++) {
+                        var empty:DisplayObject = siblings.getChildAt(j);
+                        if (getQualifiedClassName(empty) == "mlCategoryState") empty.visible = false;
+                    }
+                }
+            }
+            if (shopData == null || shopData.kind != "objects") return;
+            var holder:DisplayObjectContainer = findNamed(popup.baseView,"mcBigDisplay",0) as DisplayObjectContainer;
+            var selected:DisplayObject = holder == null ? null : holder.getChildByName("selectedItem");
+            if (selected == null || Object(selected).mogobePreviewPrepared == true) return;
+            var bounds:Rectangle = selected.getBounds(selected);
+            if (bounds.width <= 0 || bounds.height <= 0) return;
+            // Original mcBigDisplay white area: x=6.05..193.6, y=12.2..227.
+            scale = Math.min(1,120 / bounds.width,140 / bounds.height);
+            selected.scaleX = selected.scaleY = scale;
+            selected.x = 99.825 - (bounds.x + bounds.width/2) * scale;
+            selected.y = 119.6 - (bounds.y + bounds.height/2) * scale;
+            Object(selected).mogobePreviewPrepared = true;
+        }
+
+        private function shopCategoryWheel(event:MouseEvent):void {
+            if (shopPopup == null) return;
+            var node:DisplayObject = event.target as DisplayObject;
+            while (node != null && node != shopPopup.baseView) {
+                if (getQualifiedClassName(node) == "worlds4u.common.uiControls.DataGrid::ScrollDataGrid") {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    return;
+                }
+                node = node.parent;
+            }
+        }
+
+        private function moveGridDecoration(art:DisplayObject, cell:DisplayObjectContainer):void {
+            var placement:Matrix = art.transform.matrix.clone();
+            var holder:DisplayObjectContainer = art.parent;
+            while (holder != null && holder != cell) {
+                placement.concat(holder.transform.matrix);
+                holder = holder.parent;
+            }
+            cell.addChild(art);
+            art.transform.matrix = placement;
+            if (art is flash.display.InteractiveObject) flash.display.InteractiveObject(art).mouseEnabled = false;
+            if (art is DisplayObjectContainer) DisplayObjectContainer(art).mouseChildren = false;
+        }
+
+        private function preserveGridDecorations(node:DisplayObject):void {
+            var type:String = getQualifiedClassName(node);
+            var cell:DisplayObjectContainer = node as DisplayObjectContainer;
+            if (cell == null) return;
+            if (type == "worlds4u.common.uiControls.DataGrid::GridCellStore" ||
+                type == "worlds4u.common.uiControls.DataGrid::CatCell" ||
+                type == "worlds4u.common.uiControls.DataGrid::GridCell") {
+                // StateButton changes the authored MovieClip frame on hover
+                // and selection. Keep the original art/font outside that
+                // timeline so a replacement mcItemHolder cannot discard them.
+                var prefix:String = type == "worlds4u.common.uiControls.DataGrid::CatCell" ? "btnCat" : "btnItem";
+                var art:DisplayObject = findShopGraphic(cell,prefix);
+                if (art != null && art.parent != cell) moveGridDecoration(art,cell);
+                if (type == "worlds4u.common.uiControls.DataGrid::GridCellStore") {
+                    var price:TextField = cell.getChildByName("mogobeGridPrice") as TextField;
+                    for (var i:int = 0; i < cell.numChildren; i++) {
+                        var state:MovieClip = cell.getChildAt(i) as MovieClip;
+                        if (state == null || !("txtPrice" in Object(state))) continue;
+                        var source:TextField = profileField(state,"txtPrice");
+                        if (price == null && art != null && source != null) {
+                            source.name = "mogobeGridPrice";
+                            moveGridDecoration(source,cell);
+                            price = source;
+                        } else if (source != null && source != price) source.visible = false;
+                    }
+                    if (price != null) {
+                        price.visible = true;
+                        price.text = String(Object(cell).Data.Price);
+                    }
+                }
+                return;
+            }
+            for (i = 0; i < cell.numChildren; i++) preserveGridDecorations(cell.getChildAt(i));
+        }
+
+        private function countVisibleCategoryScrollers(node:DisplayObject):int {
+            var count:int = getQualifiedClassName(node) == "fl.controls::ScrollBar" && node.visible ? 1 : 0;
+            var holder:DisplayObjectContainer = node as DisplayObjectContainer;
+            if (holder != null) for (var i:int = 0; i < holder.numChildren; i++) count += countVisibleCategoryScrollers(holder.getChildAt(i));
+            return count;
+        }
+
+        private function collectShopCategories(node:DisplayObject, result:Array):void {
+            if (getQualifiedClassName(node) == "worlds4u.common.uiControls.DataGrid::CatCell") {
+                result.push(node);
+                return;
+            }
+            var holder:DisplayObjectContainer = node as DisplayObjectContainer;
+            if (holder != null) for (var i:int = 0; i < holder.numChildren; i++) collectShopCategories(holder.getChildAt(i),result);
         }
 
         private function updateWorldPanel():void {
@@ -1158,11 +1367,13 @@ package {
 
         private function consumeChatCommand(event:Event, chat:DisplayObjectContainer):void {
             var field:TextField = findNamed(chat, "txtSpeak", 0) as TextField;
-            if (field == null || field.text.replace(/^\s+|\s+$/g, "").toLowerCase() != "/exit") return;
+            if (field == null) return;
+            var command:String = field.text.replace(/^\s+|\s+$/g, "").toLowerCase();
+            if (command != "/exit" && command != "/help") return;
             event.preventDefault();
             event.stopImmediatePropagation();
             field.text = "";
-            ExternalInterface.call("onMogobeChatCommand", "exit");
+            ExternalInterface.call("onMogobeChatCommand", command.substr(1));
         }
 
         private function worldChatKey(event:KeyboardEvent):void {
@@ -1394,6 +1605,8 @@ package {
             var panelReady:Boolean = false;
             var avatarReady:Boolean = false;
             worldAvatar = null;
+            activeRoomView = null;
+            activeRoomKey = "";
             if (mainClip != null) {
                 for (var i:int = 0; i < mainClip.numChildren; i++) {
                     var child:DisplayObject = mainClip.getChildAt(i);
@@ -1408,12 +1621,16 @@ package {
                     if (type.indexOf("ml") == 0 && zOrder != null && roomView.getChildByName("mcWalkingArea") != null) {
                         prepareRoomView(roomView);
                         room = type.substr(2).toLowerCase();
+                        activeRoomView = roomView;
+                        activeRoomKey = room;
                         if (zOrder != null) {
                             for (var j:int = 0; j < zOrder.numChildren; j++) {
                                 var avatar:DisplayObject = zOrder.getChildAt(j);
                                 if (getQualifiedClassName(avatar) == "worlds4u.view.avatar::MyAvatar" && avatar.visible) {
                                     avatarReady = true;
                                     worldAvatar = avatar;
+                                    worldAvatar.addEventListener(Event.COMPLETE,beginOriginalShopArrival,false,200);
+                                    worldAvatar.addEventListener(Event.COMPLETE,finishOriginalShopArrival,false,-200);
                                     break;
                                 }
                             }
@@ -1439,9 +1656,94 @@ package {
                 ExternalInterface.call("onMogobeSceneState", state, room, panelReady, avatarReady);
             }
         }
+        private var activeRoomView:DisplayObjectContainer;
+        private var activeRoomKey:String="";
+        private var worldShopRoom:String="";
+        private var worldShopPoints:Array=[];
         private var shopPopup:Object;
         private var shopModel:flash.events.EventDispatcher;
         private var shopData:Object;
+        private var shopStore:Object;
+        private var shopItems:Object={};
+        private var shopSelectedItem:int=0;
+
+        public function setWorldShopPoints(data:Object):void {
+            worldShopRoom = String(data.room);
+            worldShopPoints = data.points as Array;
+            if (worldShopPoints == null) worldShopPoints = [];
+        }
+
+        public function getWorldShopPoints():Array {
+            return worldShopRoom == activeRoomKey ? worldShopPoints : [];
+        }
+
+        private function originalShopPointAtAvatar():Object {
+            if (activeRoomView == null || worldAvatar == null) return null;
+            var feet:flash.geom.Point = Object(worldAvatar).AvatarHitPoint;
+            var exits:DisplayObjectContainer = activeRoomView.getChildByName("mcExisPoints") as DisplayObjectContainer;
+            if (exits == null) return null;
+            if (worldShopRoom == activeRoomKey) for each (var point:Object in worldShopPoints) {
+                var region:DisplayObject = exits.getChildByName(String(point.name));
+                if (region != null && region.hitTestPoint(feet.x,feet.y,true)) return point;
+            }
+            // Arrival handling must not wait for an HTTP point list. Also route
+            // disabled/unassigned native shops to a proper unavailable message.
+            for (var i:int=0;i<exits.numChildren;i++) {
+                region=exits.getChildAt(i);
+                var name:String=region.name;
+                if (name.indexOf("mcShopPoint_") != 0 && !(activeRoomKey == "bumagsstore" && name == "mcPopupPoint_51")) continue;
+                if (region.hitTestPoint(feet.x,feet.y,true)) return {id:activeRoomKey+"."+name,name:name};
+            }
+            return null;
+        }
+
+        public function getWorldShopState():Object {
+            var point:Object = originalShopPointAtAvatar();
+            return {at:point == null ? null : point.id,windowsCreated:shopWindowsCreated,originalArrivals:nativeShopOpenings,nativeOpenings:nativeShopOpenings};
+        }
+
+        private var nativeShopOpenings:int=0;
+        private var shopWindowsCreated:int=0;
+        private var shopArrivalRegion:DisplayObject;
+        private var shopArrivalX:Number;
+        private var shopArrivalPoint:Object;
+
+        private function beginOriginalShopArrival(event:Event):void {
+            var point:Object=originalShopPointAtAvatar();
+            if (point == null || currentPopup() != null) return;
+            var exits:DisplayObjectContainer=activeRoomView.getChildByName("mcExisPoints") as DisplayObjectContainer;
+            shopArrivalRegion=exits.getChildByName(String(point.name));
+            shopArrivalPoint=point;
+            shopArrivalX=shopArrivalRegion.x;
+            // Keep the original walk-complete/cursor bookkeeping, suppress only
+            // the old popup branch during this synchronous event dispatch, then
+            // restore the exact shape before requesting the assigned catalog.
+            // No placeholder window is constructed or painted first.
+            shopArrivalRegion.x += 10000;
+        }
+
+        private function finishOriginalShopArrival(event:Event):void {
+            if (shopArrivalRegion == null) return;
+            shopArrivalRegion.x=shopArrivalX;
+            var point:Object=shopArrivalPoint;
+            shopArrivalRegion=null;
+            shopArrivalPoint=null;
+            nativeShopOpenings++;
+            ExternalInterface.call("onMogobeWorldShop",String(point.id));
+        }
+
+        private function watchOriginalShop():void {
+            // Let the original avatar manager walk, stop and open its popup.
+            // A floor click or the bounding box of a rotated trigger is not an arrival.
+            var popup:Object = currentPopup();
+            if (popup == null || popup == shopPopup || (popup.PopupId != 33 && popup.PopupId != 51)) return;
+            var point:Object = originalShopPointAtAvatar();
+            if (point == null) return;
+            nativeShopOpenings++;
+            popup.disableEvents();
+            popup.dispatchEvent(new Event(Event.CLOSE));
+            ExternalInterface.call("onMogobeWorldShop",String(point.id));
+        }
 
         public function openOriginalShop(data:Object):Boolean {
             if (mainClip == null || worldAvatar == null) return false;
@@ -1455,6 +1757,9 @@ package {
                 closeOriginalShop();
             }
             shopData = data;
+            shopStore = null;
+            shopItems = {};
+            shopSelectedItem = 0;
             shopModel = new flash.events.EventDispatcher();
             var cls:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.view.popups.PopupsManeger") as Class;
             shopPopup = Object(cls).getInstance().showPopWithLoad(33,{popupId:data.kind == "clothing" ? 2 : 6},shopModel);
@@ -1469,6 +1774,9 @@ package {
             shopPopup = null;
             shopModel = null;
             shopData = null;
+            shopStore = null;
+            shopItems = {};
+            shopSelectedItem = 0;
             ExternalInterface.call("onMogobeShopClosed");
         }
 
@@ -1478,11 +1786,14 @@ package {
             if (event.type == "STORE_DATA_EVT") {
                 var store:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.model.data.StoreTO") as Class;
                 cls = ApplicationDomain.currentDomain.getDefinition("worlds4u.events.RoomEvent") as Class;
-                shopModel.dispatchEvent(new cls("STORE_DATA_EVT",new store(shopData),"rooms__getStoreData"));
+                shopStore = new store(shopData);
+                rememberShopItems();
+                shopModel.dispatchEvent(new cls("STORE_DATA_EVT",shopStore,"rooms__getStoreData"));
             } else if (event.type == "ASK_DATA_EVT") {
                 sendShopUser();
             } else if (event.type == "BUY_ITEM_EVT") {
                 var id:int = int(Object(event).Data);
+                shopSelectedItem = id;
                 var price:int = -1;
                 for each (var item:Object in shopData.items) if (int(item.typeId) == id) price = int(item.price);
                 ExternalInterface.call("onMogobeShopBuy",shopData.key,id,price);
@@ -1501,12 +1812,60 @@ package {
             shopModel.dispatchEvent(new cls("ASK_DATA_EVT","user__getUserTO",user,int(shopData.user.userId)));
         }
 
+        private function rememberShopItems():void {
+            shopItems = {};
+            for each (var category:Object in shopStore.getCatecories())
+                for each (var item:Object in shopStore.getItemsByCategory(category.TypeId))
+                    shopItems[String(item.TypeId)] = item;
+        }
+
+        private function shopGrid(node:DisplayObject, type:String):Object {
+            if (getQualifiedClassName(node) == "worlds4u.common.uiControls.DataGrid::"+type) return node;
+            var holder:DisplayObjectContainer = node as DisplayObjectContainer;
+            if (holder != null) for (var i:int=0;i<holder.numChildren;i++) {
+                var found:Object=shopGrid(holder.getChildAt(i),type);
+                if (found != null) return found;
+            }
+            return null;
+        }
+
+        private function sameShopStructure(data:Object):Boolean {
+            if (shopStore == null || data.kind != shopData.kind || data.items.length != shopData.items.length || data.categories.length != shopData.categories.length) return false;
+            for (var i:int=0;i<data.categories.length;i++)
+                if (data.categories[i].typeId != shopData.categories[i].typeId || data.categories[i].name != shopData.categories[i].name) return false;
+            for (i=0;i<data.items.length;i++) {
+                var a:Object=data.items[i];
+                var b:Object=shopData.items[i];
+                if (a.typeId != b.typeId || a.sCat != b.sCat || a.pCat != b.pCat || a.mType != b.mType) return false;
+            }
+            return true;
+        }
+
         public function refreshOriginalShop(data:Object):void {
             if (shopPopup == null || shopData == null || data.key != shopData.key) return;
-            shopData = data;
-            var store:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.model.data.StoreTO") as Class;
-            var cls:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.events.RoomEvent") as Class;
-            shopModel.dispatchEvent(new cls("STORE_DATA_EVT",new store(data),"rooms__getStoreData"));
+            if (data.sourcePoint == null) data.sourcePoint = shopData.sourcePoint;
+            if (sameShopStructure(data)) {
+                // Prices, balance and stock do not replace StoreTO or reset Data.
+                // Rebind only the visible eight cells; ButtonDataGrid retains its page.
+                var grid:Object=shopGrid(shopPopup.baseView,"ButtonDataGrid");
+                var selected:int=grid != null && grid.selected != null ? int(grid.selected.TypeId) : shopSelectedItem;
+                for each (var raw:Object in data.items) {
+                    var item:Object=shopItems[String(raw.typeId)];
+                    if (item != null) { item.Price=int(raw.price);item.InStock=Boolean(raw.inStock); }
+                }
+                shopData = data;
+                if (grid != null) {
+                    grid.baind();
+                    if (selected>0 && shopItems[String(selected)] != null) grid.select(shopItems[String(selected)]);
+                }
+            } else {
+                shopData = data;
+                var store:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.model.data.StoreTO") as Class;
+                var cls:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.events.RoomEvent") as Class;
+                shopStore = new store(data);
+                rememberShopItems();
+                shopModel.dispatchEvent(new cls("STORE_DATA_EVT",shopStore,"rooms__getStoreData"));
+            }
             sendShopUser();
         }
 
@@ -1547,7 +1906,12 @@ package {
                 var hit:flash.geom.Point = globalToLocal(node.localToGlobal(new flash.geom.Point(42.85,31.95)));
                 var artwork:DisplayObject = findShopGraphic(node,"btnItem");
                 var artBounds:Rectangle = artwork == null ? null : artwork.getBounds(node);
-                result.push({art:artBounds == null ? null : {x:artBounds.x,y:artBounds.y,width:artBounds.width,height:artBounds.height},hitX:hit.x,hitY:hit.y,id:int(data.TypeId),price:int(data.Price),available:Boolean(data.InStock),
+                var priceLabel:TextField = DisplayObjectContainer(node).getChildByName("mogobeGridPrice") as TextField;
+                var priceBounds:Rectangle = priceLabel == null ? null : priceLabel.getBounds(this);
+                result.push({priceVisible:priceLabel != null && priceLabel.visible,priceText:priceLabel == null ? null : priceLabel.text,
+                    priceX:priceBounds == null ? 0 : priceBounds.x + priceBounds.width/2,
+                    priceY:priceBounds == null ? 0 : priceBounds.y + priceBounds.height/2,
+                    art:artBounds == null ? null : {x:artBounds.x,y:artBounds.y,width:artBounds.width,height:artBounds.height},hitX:hit.x,hitY:hit.y,id:int(data.TypeId),price:int(data.Price),available:Boolean(data.InStock),
                     x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height,
                     graphics:countShopGraphics(node)});
             }
@@ -1560,10 +1924,27 @@ package {
             var cells:Array = [];
             shopCells(shopPopup.baseView,cells);
             var preview:DisplayObject = findNamed(shopPopup.baseView,"mcAvatarBig",0);
+            var wornPreview:DisplayObject = preview == null ? null : findShopGraphic(preview,"mlBigItem");
             var panel:DisplayObjectContainer = findNamed(shopPopup.baseView,"mcShop",0) as DisplayObjectContainer;
             var luxury:DisplayObject = panel == null ? null : panel.getChildByName("txtAmount_2");
             var amount:DisplayObject = panel == null ? null : panel.getChildByName("txtAmount_1");
-            return {luxuryVisible:luxury != null && luxury.visible,coinY:amount == null ? 0 : amount.y,
+            var tabs:Array = [];
+            var categoryCells:Array = [];
+            collectShopCategories(shopPopup.baseView,categoryCells);
+            for each (var cell:DisplayObject in categoryCells) {
+                var center:flash.geom.Point = globalToLocal(cell.localToGlobal(new flash.geom.Point(22.475,18.25)));
+                var area:Rectangle = cell.getBounds(this);
+                var icon:DisplayObject = findShopGraphic(cell,"btnCat");
+                tabs.push({id:int(Object(cell).Data.TypeId),iconVisible:icon != null && icon.visible,
+                    hitX:center.x,hitY:center.y,x:area.x,y:area.y,width:area.width,height:area.height});
+            }
+            var holder:DisplayObjectContainer = findNamed(shopPopup.baseView,"mcBigDisplay",0) as DisplayObjectContainer;
+            var selected:DisplayObject = holder == null ? null : holder.getChildByName("selectedItem");
+            var previewBounds:Rectangle = selected == null ? null : selected.getBounds(holder);
+            var itemGrid:Object=shopGrid(shopPopup.baseView,"ButtonDataGrid");
+            var categoryGrid:Object=shopGrid(shopPopup.baseView,"ScrollDataGrid");
+            return {sourcePoint:shopData.sourcePoint,selectedItem:itemGrid != null && itemGrid.selected != null ? itemGrid.selected.TypeId : null,selectedCategory:categoryGrid != null && categoryGrid.selected != null ? categoryGrid.selected.TypeId : null,categoryScrollers:countVisibleCategoryScrollers(shopPopup.baseView),tryOn:wornPreview == null ? null : getQualifiedClassName(wornPreview),categories:tabs,preview:previewBounds == null ? null : {x:previewBounds.x,y:previewBounds.y,width:previewBounds.width,height:previewBounds.height},
+                luxuryVisible:luxury != null && luxury.visible,coinY:amount == null ? 0 : amount.y,
                 key:shopData.key,title:shopData.title,kind:shopData.kind,coins:shopData.coins,
                 itemCount:shopData.items.length,items:cells,text:collectText(shopPopup.baseView),
                 visible:shopPopup.baseView.stage != null,avatar:preview != null && preview.visible};

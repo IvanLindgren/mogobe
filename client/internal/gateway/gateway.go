@@ -17,6 +17,7 @@ import (
 )
 
 type Gateway struct {
+	graphics        graphicCache
 	CopyAvatarImage ImageCopier
 	target          *url.URL
 	client          *http.Client
@@ -117,6 +118,10 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		g.localAccounts(w, r)
 		return
 	}
+	if r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/api/shop-assets/") {
+		g.serveGraphic(w, r)
+		return
+	}
 	method, body := r.Method, io.Reader(r.Body)
 	legacy := false
 	switch strings.ToLower(path) {
@@ -159,6 +164,13 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	target := *g.target
 	target.Path = strings.TrimRight(target.Path, "/") + path
 	target.RawPath, target.RawQuery = "", ""
+	if path == "/api/shop-points" {
+		query := target.Query()
+		if room := r.URL.Query().Get("room"); room != "" {
+			query.Set("room", room)
+		}
+		target.RawQuery = query.Encode()
+	}
 	out, err := http.NewRequestWithContext(r.Context(), method, target.String(), body)
 	if err != nil {
 		http.Error(w, "Invalid backend URL", 502)

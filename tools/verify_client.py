@@ -5,8 +5,13 @@ import subprocess
 import sys
 
 SUITES = {
+    "admin-catalog": ("verify_shops.py", ["--catalog"]),
+    "commands": ("verify_multiplayer.py", ["--commands"]),
+    "wardrobe": ("verify_multiplayer.py", ["--wardrobe"]),
     "shops": ("verify_shops.py", []),
-    "shop-admin": ("verify_shop_admin.py", []),
+    "world-shops": ("verify_shops.py", ["--world-points"]),
+    "admin": ("verify_admin.py", []),
+    "shop-admin": ("verify_admin.py", []),  # Previous suite name.
     "room-links": ("verify_multiplayer.py", ["--room-links"]),
     "map-timing": ("verify_multiplayer.py", ["--map-timing"]),
     "map-ui": ("verify_multiplayer.py", ["--map-ui"]),

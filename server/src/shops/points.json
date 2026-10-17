@@ -1,0 +1,278 @@
+[
+  {
+    "id": "africa.mcShopPoint_1",
+    "room_key": "africa",
+    "room_title": "Африка",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      395.05,
+      474.186,
+      167.757,
+      263.277
+    ]
+  },
+  {
+    "id": "bumagsfoodtoysstore.mcShopPoint_4",
+    "room_key": "bumagsfoodtoysstore",
+    "room_title": "Еда и игрушки для бумагов",
+    "name": "mcShopPoint_4",
+    "bounds": [
+      59.546,
+      213.958,
+      298.989,
+      377.667
+    ]
+  },
+  {
+    "id": "bumagspotionstore.mcShopPoint_4",
+    "room_key": "bumagspotionstore",
+    "room_title": "Зелья для бумагов",
+    "name": "mcShopPoint_4",
+    "bounds": [
+      80.695,
+      354.473,
+      250.05,
+      348.278
+    ]
+  },
+  {
+    "id": "bumagsstore.mcPopupPoint_51",
+    "room_key": "bumagsstore",
+    "room_title": "Магазин бумагов",
+    "name": "mcPopupPoint_51",
+    "bounds": [
+      521.315,
+      730.704,
+      311.878,
+      412.496
+    ]
+  },
+  {
+    "id": "caeteorube.mcShopPoint_1",
+    "room_key": "caeteorube",
+    "room_title": "CaeteOrube",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      404.05,
+      483.186,
+      174.105,
+      253.082
+    ]
+  },
+  {
+    "id": "clothesstore.mcShopPoint_1",
+    "room_key": "clothesstore",
+    "room_title": "Стиляги",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      664.586,
+      768.866,
+      254.219,
+      318.267
+    ]
+  },
+  {
+    "id": "foresttree.mcShopPoint_1",
+    "room_key": "foresttree",
+    "room_title": "Полое дерево",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      118.609,
+      311.732,
+      292.339,
+      371.724
+    ]
+  },
+  {
+    "id": "furniturestore.mcShopPoint_2",
+    "room_key": "furniturestore",
+    "room_title": "МогоДом",
+    "name": "mcShopPoint_2",
+    "bounds": [
+      245.734,
+      349.828,
+      241.652,
+      321.368
+    ]
+  },
+  {
+    "id": "island.mcShopPoint_1",
+    "room_key": "island",
+    "room_title": "Остров",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      171.654,
+      301.639,
+      156.333,
+      230.526
+    ]
+  },
+  {
+    "id": "jewelrystore.mcShopPoint_2",
+    "room_key": "jewelrystore",
+    "room_title": "Мастерская украшений",
+    "name": "mcShopPoint_2",
+    "bounds": [
+      553.2,
+      634.988,
+      275.203,
+      388.722
+    ]
+  },
+  {
+    "id": "kingsroad.mcShopPoint_1",
+    "room_key": "kingsroad",
+    "room_title": "Солнечная улица",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      198.059,
+      371.286,
+      256.131,
+      323.009
+    ]
+  },
+  {
+    "id": "mall.mcShopPoint_1",
+    "room_key": "mall",
+    "room_title": "Могоцентр",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      274.859,
+      498.727,
+      310.972,
+      406.966
+    ]
+  },
+  {
+    "id": "meetingroom.mcShopPoint_1",
+    "room_key": "meetingroom",
+    "room_title": "Комната дозорных",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      451.757,
+      621.35,
+      224.621,
+      321.768
+    ]
+  },
+  {
+    "id": "mexico.mcShopPoint_1",
+    "room_key": "mexico",
+    "room_title": "Мексика",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      153.109,
+      268.45,
+      175.464,
+      243.899
+    ]
+  },
+  {
+    "id": "partyroom_pirates.mcShopPoint_1",
+    "room_key": "partyroom_pirates",
+    "room_title": "Пиратская вечеринка",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      303.476,
+      467.576,
+      168.309,
+      226.093
+    ]
+  },
+  {
+    "id": "partyroom_reg.mcShopPoint_1",
+    "room_key": "partyroom_reg",
+    "room_title": "Танцевальная вечеринка",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      387.703,
+      526.507,
+      230.847,
+      279.912
+    ]
+  },
+  {
+    "id": "partyroom_sweets.mcShopPoint_1",
+    "room_key": "partyroom_sweets",
+    "room_title": "Сладкая вечеринка",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      370.704,
+      515.296,
+      175.278,
+      223.392
+    ]
+  },
+  {
+    "id": "profymeetingroom.mcShopPoint_1",
+    "room_key": "profymeetingroom",
+    "room_title": "Тайная комната Профи",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      447.238,
+      607.75,
+      225.271,
+      310.239
+    ]
+  },
+  {
+    "id": "skazkino.mcShopPoint_1",
+    "room_key": "skazkino",
+    "room_title": "Сказкино",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      427.12,
+      528.409,
+      233.95,
+      299.512
+    ]
+  },
+  {
+    "id": "spa.mcShopPoint_1",
+    "room_key": "spa",
+    "room_title": "Спа",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      497.335,
+      578.27,
+      248.447,
+      291.712
+    ]
+  },
+  {
+    "id": "sportstore.mcShopPoint_1",
+    "room_key": "sportstore",
+    "room_title": "Лига",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      664.586,
+      768.866,
+      254.219,
+      318.267
+    ]
+  },
+  {
+    "id": "sunandsea.mcShopPoint_1",
+    "room_key": "sunandsea",
+    "room_title": "Солнцеморье",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      59.55,
+      189.941,
+      220.493,
+      268.279
+    ]
+  },
+  {
+    "id": "vugovo.mcShopPoint_1",
+    "room_key": "vugovo",
+    "room_title": "Вьюгово",
+    "name": "mcShopPoint_1",
+    "bounds": [
+      44.724,
+      207.879,
+      261.831,
+      346.499
+    ]
+  }
+]

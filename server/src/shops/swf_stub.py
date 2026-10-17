@@ -25,23 +25,31 @@ def tag(kind, data=b""):
     return struct.pack("<HI", (kind << 6) | 63, len(data)) + data
 
 
-def build(class_name="mlLoadingScreen_0", root=False):
+def build(class_name="mlLoadingScreen_0", root=False, frame=None):
     abc = bytearray(struct.pack("<HH", 16, 46))
     abc += b"\x01\x01\x01"  # empty int/uint/double pools
     strings = [b"", b"flash.display", b"MovieClip", class_name.encode("ascii")]
+    if frame is not None:
+        strings.append(b"gotoAndStop")
     abc += u30(len(strings))
     for value in strings[1:]:
         abc += u30(len(value)) + value
     abc += b"\x03\x16\x00\x16\x01"  # public package namespaces
     abc += b"\x01"  # namespace sets
-    abc += b"\x03\x07\x02\x02\x07\x01\x03"  # MovieClip and our class QNames
+    abc += bytes([4 if frame is not None else 3]) + b"\x07\x02\x02\x07\x01\x03"
+    if frame is not None:
+        abc += b"\x07\x01\x04"  # public gotoAndStop
     abc += b"\x03" + b"\x00\x00\x00\x00" * 3  # method signatures
     abc += b"\x00"  # metadata
     abc += b"\x01\x02\x01\x00\x00\x00\x00"  # class instance
     abc += b"\x01\x00"  # static initializer, no traits
     abc += b"\x01\x02\x01\x02\x04\x01\x00"  # script exporting class
+    constructor = bytes.fromhex("d0 30 d0 49 00")
+    if frame is not None:
+        constructor += bytes.fromhex("d0 25") + u30(frame) + bytes.fromhex("4f 03 01")
+    constructor += b"\x47"
     bodies = [
-        (0, 1, 1, 1, 2, bytes.fromhex("d0 30 d0 49 00 47")),
+        (0, 2 if frame is not None else 1, 1, 1, 2, constructor),
         (1, 1, 1, 1, 2, bytes.fromhex("d0 30 47")),
         (2, 2, 1, 0, 2, bytes.fromhex("d0 30 65 00 60 01 30 60 01 58 00 1d 68 02 47")),
     ]

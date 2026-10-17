@@ -19,20 +19,29 @@ window.onMogobeAvatarPhoto = async jpeg => {
   } catch(error) { window.mogobeLastPhoto = {copied:false};showMogobePopup(error.message); }
 };
 window.onMogobeProfileShown=()=>{setTimeout(()=>refreshOriginalProfile(),0);};
+let shopPointsRoom='',shopPointsSequence=0;
+async function refreshWorldShopPoints(){
+ const room=window.mogobeScene?.room;
+ if(window.mogobeScene?.state!=='world'||!room)return;
+ const sequence=++shopPointsSequence;
+ try{const response=await fetch('/api/shop-points?room='+encodeURIComponent(room));if(!response.ok)return;const data=await response.json();if(sequence===shopPointsSequence&&room===window.mogobeScene.room){shopPointsRoom=room;window.player?.ruffle().callExternalInterface('setWorldShopPoints',data);}}catch{}
+}
+window.onMogobeWorldShop=point=>openMogobeShop('',false,point);
 let activeShopKey = '', shopOpenSeen = 0, shopRevisionSeen = 0, shopFetchSequence = 0;
 window.onMogobeShopClosed = () => { activeShopKey='';shopFetchSequence++; };
-async function openMogobeShop(key, refresh=false) {
+async function openMogobeShop(key, refresh=false, point="") {
   const sequence=++shopFetchSequence;
   try {
-    const response=await fetch('/api/shops/'+encodeURIComponent(key),{cache:'no-store'});
+    const response=await fetch(point?'/api/shop-points/'+encodeURIComponent(point)+'/open':'/api/shops/'+encodeURIComponent(key),{method:point?'POST':'GET',cache:'no-store'});
     const data=await response.json();
     if(!response.ok) throw Error(typeof data.detail==='string'?data.detail:'Магазин недоступен.');
     if(sequence!==shopFetchSequence || leavingWorld) return;
+    if(point)data.sourcePoint=point;
     if(refresh) window.player?.ruffle().callExternalInterface('refreshOriginalShop',data);
     else {
       const opened=window.player?.ruffle().callExternalInterface('openOriginalShop',data);
       if(!opened) throw Error('Закройте открытое окно и повторите команду магазина.');
-      activeShopKey=key;
+      activeShopKey=data.key;
     }
   } catch(error) {
     if(refresh) window.player?.ruffle().callExternalInterface('closeOriginalShop');
@@ -45,7 +54,6 @@ window.onMogobeShopBuy = async (key,itemId,price) => {
     const data=await response.json();
     if(!response.ok) throw Error(typeof data.detail==='string'?data.detail:'Покупка не выполнена.');
     window.player?.ruffle().callExternalInterface('finishShopPurchase',true);
-    await openMogobeShop(key,true);
   } catch(error) {
     window.player?.ruffle().callExternalInterface('finishShopPurchase',false);
     showMogobePopup(error.message);
@@ -123,6 +131,7 @@ window.onMogobeRememberedAccounts = async names => {
 window.onMogobeSceneState = (state,room,panelReady,avatarReady) => {
   window.mogobeScene = {...window.mogobeScene,state,room,panelReady,avatarReady};
   document.getElementById('loading').hidden = state !== 'loading';
+  if(state==='world'&&room!==shopPointsRoom)refreshWorldShopPoints();
   if(state === 'lobby') {
     const error = sessionStorage.getItem('mogobe.worldError');
     if(error) { sessionStorage.removeItem('mogobe.worldError'); setTimeout(()=>showMogobePopup(error),0); }
@@ -169,6 +178,7 @@ window.onTrackEvent = async (category,action) => {
     window.mogobeScene = {...window.mogobeScene, user};
   } catch(error) { signedIn = false; showNotice(error.message); }
 };
+const pendingWorldAlerts=[];
 async function watchWorld() {
   while(signedIn && !leavingWorld) {
     try {
@@ -181,7 +191,12 @@ async function watchWorld() {
         location.assign('/');
         return;
       }
+      pendingWorldAlerts.push(...(status.notices??[]));
       if(window.mogobeScene?.state === 'world') {
+        if(pendingWorldAlerts.length && (!window.mogobePopup || window.mogobePopup.state==='closed')) {
+          const notice=pendingWorldAlerts.shift();
+          showMogobePopup('Объявление от '+notice.sender+'\n'+notice.text);
+        }
         if((status.shop_serial??0)!==shopOpenSeen) {
           shopOpenSeen=status.shop_serial??0;
           if(status.shop_key) await openMogobeShop(status.shop_key);
@@ -190,6 +205,7 @@ async function watchWorld() {
           shopRevisionSeen=status.shop_revision??0;
           if(activeShopKey) await openMogobeShop(activeShopKey,true);
           await refreshOriginalProfile();
+          await refreshWorldShopPoints();
         }
       }
       const version = status.social_revision ?? 0;
@@ -279,6 +295,21 @@ document.addEventListener('keydown',event=>{
 },true);
 
 window.onMogobeChatCommand = command => {
+  if(command === 'help') {
+    setTimeout(async()=>{
+      try {
+        const response=await fetch('/api/world/commands',{cache:'no-store'});
+        if(!response.ok) throw new Error('Не удалось получить список команд.');
+        const data=await response.json();
+        window.mogobeCommandHelp=data;
+        const lines=['Доступные команды'];
+        for(const row of [...data.commands,...data.shortcuts]) lines.push(row.syntax+' — '+row.description);
+        lines.push('',...data.notes);
+        await showMogobePopup(lines.join('\n'),{kind:'commands'});
+      } catch(error) { showMogobePopup(error.message); }
+    },0);
+    return;
+  }
   if(command !== 'exit' || leavingWorld) return;
   leavingWorld = true;
   // Leave the current Ruffle callback before unloading its player.

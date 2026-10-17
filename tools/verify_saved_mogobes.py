@@ -49,6 +49,7 @@ def main():
         client_log = (OUT/'client.log').open('w',encoding='utf-8')
         try:
             env = os.environ.copy()
+            env["MOGOBE_BOOTSTRAP_DEFAULTS"]="false"
             env['MOGOBE_DATABASE_URL'] = 'sqlite+aiosqlite:///'+database.as_posix()
             env['MOGOBE_LOGIN_LIMIT'] = '100'
             env['PYTHONPATH'] = str(ROOT/'server/.venv/Lib/site-packages')

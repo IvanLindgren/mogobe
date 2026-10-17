@@ -15,6 +15,12 @@ class Shop(Base):
     room_key: Mapped[str | None] = mapped_column(String(40), unique=True)
 
 
+class ShopPoint(Base):
+    __tablename__ = "shop_point"
+    point_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shop.id", ondelete="CASCADE"), index=True)
+
+
 class Item(Base):
     __tablename__ = "shop_item"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=False)
@@ -29,6 +35,7 @@ class Category(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     shop_id: Mapped[int] = mapped_column(ForeignKey("shop.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String(60))
+    inventory_category: Mapped[int | None]
     icon_id: Mapped[int] = mapped_column(default=1)
     sort: Mapped[int] = mapped_column(default=0)
 

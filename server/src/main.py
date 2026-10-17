@@ -9,6 +9,8 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from src.admin.bootstrap import initialize
+from src.admin.router import router as admin_router
 from src.auth.router import router as auth_router
 from src.auth.service import AttemptLimiter
 from src.config import ROOT, Settings
@@ -17,7 +19,9 @@ from src.inventory.router import router as inventory_router
 from src.legacy.router import router as legacy_router
 from src.legacy.socket import router as socket_router
 from src.profiles.router import router as social_router
+from src.shops.admin_router import router as admin_shops_router
 from src.shops.graphics import router as shop_graphics_router
+from src.shops.points_router import router as shop_points_router
 from src.shops.router import router as shops_router
 from src.world.hub import WorldHub
 from src.world.router import router as world_router
@@ -31,8 +35,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app):
-        yield
-        await engine.dispose()
+        try:
+            if settings.bootstrap_defaults:
+                async with app.state.sessions() as db:
+                    seeded = await initialize(db)
+                logging.getLogger("mogobe.startup").info(
+                    "Server defaults ready: admin_created=%s, catalog_items=%s, offers_added=%s",
+                    seeded["admin_created"],
+                    seeded["total_assets"],
+                    seeded["offers_created"],
+                )
+            yield
+        finally:
+            await engine.dispose()
 
     app = FastAPI(title="Mogobe server", version="0.1.0", lifespan=lifespan)
     app.state.commerce_lock = asyncio.Lock()
@@ -50,7 +65,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         try:
             response = await call_next(request)
             status = response.status_code
-            response.headers["Cache-Control"] = "no-store"
+            response.headers.setdefault("Cache-Control", "no-store")
             return response
         finally:
             # Only the decoded route path is logged. Never include URL queries,
@@ -79,7 +94,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(socket_router)
     app.include_router(world_router)
     app.include_router(social_router)
+    app.include_router(admin_router)
+    app.include_router(admin_shops_router)
     app.include_router(shops_router)
+    app.include_router(shop_points_router)
     app.include_router(inventory_router)
     app.include_router(shop_graphics_router)
     app.mount(

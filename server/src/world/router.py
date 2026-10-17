@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response
 
 from src.auth.dependencies import CurrentAccount, Database, get_token
-from src.world import catalog
+from src.world import catalog, commands
 from src.world.presence import server_snapshot
 
 router = APIRouter(prefix="/api/world", tags=["world"])
@@ -39,3 +39,8 @@ async def rooms(account: CurrentAccount):
             for room in catalog.DATA["rooms"]
         ]
     }
+
+
+@router.get("/commands")
+async def command_help(account: CurrentAccount):
+    return commands.available(account.is_admin)

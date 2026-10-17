@@ -63,6 +63,8 @@ def metadata():
 @lru_cache(maxsize=5000)
 def wrapped(role, ident, category_id=0):
     source_role = "Display" if role == "Preview" else role
+    if source_role == "Display" and "Display" not in metadata().get(str(ident), {}):
+        source_role = "Walking"
     info = (
         category_icons().get(ident)
         if role == "Cats"
@@ -123,7 +125,7 @@ def wrapped(role, ident, category_id=0):
     if role == "InUse":
         exports.append((info["sprite_id"], f"mlIconSItem{ident}"))
     else:
-        if role == "Display":
+        if role == "Display" or source_role == "Walking":
             exports.append((info["sprite_id"], f"mlBigItem{ident}"))
         names = [f"btnCat{category_id}" if role == "Cats" else f"btnItem{ident}"]
         for name in names:
@@ -155,7 +157,9 @@ def wrapped(role, ident, category_id=0):
             exports.append((next_id, name))
             next_id += 1
     for _, name in exports:
-        stub = build(name)
+        stub = build(
+            name, frame=info.get("preview_frame") if name.startswith("mlBigItem") else None
+        )
         sb = stub[8:]
         start = (5 + (sb[0] >> 3) * 4 + 7) // 8 + 4
         result += b"".join(tag(k, b) for k, b in records(sb[start:]) if k == 82)
@@ -188,16 +192,24 @@ async def category_icon(ident: int):
 
 @router.get("/raw/{ident}.swf")
 async def raw_graphic(ident: int):
-    if not (ASSETS / "Display" / f"{ident}.swf").is_file():
-        raise HTTPException(404, "Нет изображения")
+    role = "Display" if (ASSETS / "Display" / f"{ident}.swf").is_file() else "Walking"
+    path = ASSETS / role / f"{ident}.swf"
+    if not path.is_file():
+        raise HTTPException(404, "Нет изображения или анимации")
     return FileResponse(
-        ASSETS / "Display" / f"{ident}.swf", media_type="application/x-shockwave-flash"
+        path,
+        media_type="application/x-shockwave-flash",
+        headers={"Cache-Control": "public, max-age=3600"},
     )
 
 
 @router.get("/preview/{ident}.swf")
 async def preview_graphic(ident: int):
-    return Response(wrapped("Preview", ident), media_type="application/x-shockwave-flash")
+    return Response(
+        wrapped("Preview", ident),
+        media_type="application/x-shockwave-flash",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
 
 
 @router.get("/{role}/{ident}.swf")
@@ -213,7 +225,15 @@ async def graphic(role: str, ident: int, db: Database):
         path = ROOT.parent / f"assets/compat/item-animations/{ident}.swf"
         if not path.is_file():
             raise HTTPException(404, "Нет полной анимации предмета")
-        return FileResponse(path, media_type="application/x-shockwave-flash")
+        return FileResponse(
+            path,
+            media_type="application/x-shockwave-flash",
+            headers={"Cache-Control": "public, max-age=3600"},
+        )
     else:
         data = wrapped(role, ident)
-    return Response(data, media_type="application/x-shockwave-flash")
+    return Response(
+        data,
+        media_type="application/x-shockwave-flash",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )

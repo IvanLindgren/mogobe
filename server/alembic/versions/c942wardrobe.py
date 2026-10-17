@@ -1,6 +1,7 @@
 """Persistent clothing slots, independent of room coordinates."""
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision = "c942wardrobe"

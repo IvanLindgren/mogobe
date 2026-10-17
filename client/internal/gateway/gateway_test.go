@@ -131,3 +131,19 @@ func TestOriginalPopupPathsResolveToDescriptiveAssets(t *testing.T) {
 		}
 	}
 }
+
+func TestShopPointsForwardOnlyRoomQuery(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/api/shop-points" || r.URL.RawQuery != "room=mall" {
+			t.Errorf("unexpected point request: %s", r.URL.String())
+		}
+		io.WriteString(w, `{"room":"mall","points":[]}`)
+	}))
+	defer server.Close()
+	g := New(server.URL, time.Second)
+	w := httptest.NewRecorder()
+	g.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/shop-points?room=mall&password=discard", nil))
+	if w.Code != http.StatusOK {
+		t.Fatalf("status %d", w.Code)
+	}
+}

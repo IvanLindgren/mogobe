@@ -37,8 +37,11 @@ def validated_message(text, sender, members):
     action = parts[0]
     if action in {"speak", "speakRoom", "speakServer"}:
         content = text.partition("__")[2]
-        while "__" in content:
-            content = content.replace("__", "_")
+        # Command arguments can contain valid double underscores in a nickname
+        # or announcement. These commands are consumed by the server, not speech.
+        if not content.lstrip().casefold().startswith(("/give ", "/alert ")):
+            while "__" in content:
+                content = content.replace("__", "_")
         content = content.strip()
         if not content or len(content) > 240 or any(ord(c) < 32 for c in content):
             return None

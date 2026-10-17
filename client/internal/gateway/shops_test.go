@@ -31,7 +31,7 @@ func TestShopGraphicOverOneMegabyteIsNotTruncated(t *testing.T) {
 
 func TestAdministrationIsNotExposedByGameClient(t *testing.T) {
 	gateway := New("http://127.0.0.1:1", time.Millisecond)
-	for _, path := range []string{"/admin/shops", "/admin/runtime/ruffle.js", "/api/admin/shops", "/api/admin/shops/login"} {
+	for _, path := range []string{"/admin", "/admin/", "/admin/app.js", "/api/admin/login", "/api/admin/accounts", "/api/admin/items", "/api/admin/overview", "/admin/shops", "/admin/runtime/ruffle.js", "/api/admin/shops", "/api/admin/shops/login"} {
 		recorder := httptest.NewRecorder()
 		gateway.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { t.Fatal("admin request reached embedded assets") })).ServeHTTP(recorder, httptest.NewRequest("GET", "http://wails.localhost"+path, nil))
 		if recorder.Code != http.StatusNotFound {

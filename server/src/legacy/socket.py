@@ -19,6 +19,7 @@ from anyio import CancelScope
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy import select
 
+from src.admin.commands import alert, give
 from src.auth.dependencies import get_token
 from src.auth.models import Account
 from src.auth.service import find_account
@@ -26,7 +27,7 @@ from src.legacy.messages import validated_message
 from src.profiles import progression, social
 from src.profiles import service as profiles
 from src.shops import service as shops
-from src.shops.commands import give
+from src.shops import world_shops
 from src.shops.models import Shop
 from src.world import catalog, service
 from src.world.hub import BUSY_MESSAGE
@@ -295,8 +296,8 @@ class LegacyConnection:
                     return
                 self.last_chat = monotonic()
                 action, _, text = content.partition("__")
-                if action in {"speak", "speakRoom", "speakServer"} and text.casefold().startswith(
-                    "/room "
+                if action in {"speak", "speakRoom", "speakServer"} and (
+                    text.casefold() == "/room" or text.casefold().startswith("/room ")
                 ):
                     destination = catalog.resolve(text.partition(" ")[2])
                     if destination:
@@ -335,6 +336,21 @@ class LegacyConnection:
                 ):
                     try:
                         message = await give(self.socket.app, self.account.id, text)
+                    except HTTPException as exc:
+                        message = str(exc.detail)
+                    await self.send(
+                        system(
+                            "pubMsg",
+                            f'<user id="{self.account.id}"/><txt>speak__{escape(message)}</txt>',
+                            self.room,
+                        )
+                    )
+                    return
+                if action in {"speak", "speakRoom", "speakServer"} and (
+                    text.casefold() == "/alert" or text.casefold().startswith("/alert ")
+                ):
+                    try:
+                        message = await alert(self.socket.app, self.account.id, text)
                     except HTTPException as exc:
                         message = str(exc.detail)
                     await self.send(
@@ -467,7 +483,6 @@ class LegacyConnection:
                         await self.extension(command, errorId=11, msgId=11)
                         return
                     self.muted_ids = await social.muted_ids(db, self.account.id)
-                self.state["items"] = json.dumps(fields["items"], ensure_ascii=False)
                     counts = {
                         ident: await social.pending_count(db, ident)
                         for ident in (self.account.id, buddy)
@@ -531,6 +546,15 @@ class LegacyConnection:
                     if room_key
                     else None
                 )
+                assigned = (
+                    await world_shops.nearby(
+                        db, current, room_key, self.state.get("x"), self.state.get("y")
+                    )
+                    if room_key
+                    else None
+                )
+                if assigned:
+                    _, shop = assigned
                 if shop:
                     try:
                         shop = await shops.get_shop(db, shop.key, current)
@@ -569,18 +593,35 @@ class LegacyConnection:
                 return
             async with self.socket.app.state.sessions() as db:
                 from src.inventory import service as wardrobe
-                items = await wardrobe.available(db, self.account.id, params.get("mainType"), params.get("placeCategorys"))
+
+                items = await wardrobe.available(
+                    db, self.account.id, params.get("mainType"), params.get("placeCategorys")
+                )
             await self.extension(command, items=items, userId=self.account.id)
         elif command in ("user__setInUseItem", "user__setNotInUseItem"):
             from src.inventory import service as wardrobe
+
             requested = params.get("items")
-            ids = [row.get("id") if isinstance(row, dict) else None for row in requested] if isinstance(requested, list) else None
+            ids = (
+                [row.get("id") if isinstance(row, dict) else None for row in requested]
+                if isinstance(requested, list)
+                else None
+            )
             async with self.socket.app.state.commerce_lock:
                 async with self.socket.app.state.sessions() as db:
                     try:
-                        items = await wardrobe.change(db, self.account.id, ids, wear=command == "user__setInUseItem")
+                        items = await wardrobe.change(
+                            db, self.account.id, ids, wear=command == "user__setInUseItem"
+                        )
                     except HTTPException as error:
-                        await self.extension("error", errorId=11, message=str(error.detail))
+                        await self.send(
+                            system(
+                                "pubMsg",
+                                f'<user id="{self.account.id}"/>'
+                                + f"<txt>speak__{escape(str(error.detail))}</txt>",
+                                self.room,
+                            )
+                        )
                         return
                 await wardrobe.notify(self.socket.app, self.account.id, items)
                 await self.extension(command, items=items, userId=self.account.id)

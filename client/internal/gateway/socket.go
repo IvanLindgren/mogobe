@@ -19,7 +19,13 @@ import (
 // WebView2's asset response writer cannot upgrade HTTP to WebSocket. This
 // loopback bridge tunnels Ruffle's original TCP stream to the configured API.
 // Only a random local capability reaches JS; the account session stays in Go.
+type worldNotice struct {
+	Text   string `json:"text"`
+	Sender string `json:"sender"`
+}
+
 type worldSocket struct {
+	notices        []worldNotice
 	mu             sync.Mutex
 	token          string
 	generation     uint64
@@ -44,6 +50,7 @@ func (g *Gateway) setWorldSession(token string) {
 	g.world.token = token
 	g.world.generation++
 	g.world.error = ""
+	g.world.notices = nil
 }
 
 func (g *Gateway) StartWorldSocket(preview string) (func(), error) {
@@ -78,10 +85,12 @@ func (g *Gateway) worldRuntime(w http.ResponseWriter) {
 func (g *Gateway) worldStatus(w http.ResponseWriter) {
 	g.world.mu.Lock()
 	message, revision := g.world.error, g.world.socialRevision
+	notices := g.world.notices
+	g.world.notices = nil
 	shopRevision, shopSerial, shopKey := g.world.shopRevision, g.world.shopSerial, g.world.shopKey
 	g.world.mu.Unlock()
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]any{"error": message, "social_revision": revision, "shop_revision": shopRevision, "shop_serial": shopSerial, "shop_key": shopKey})
+	json.NewEncoder(w).Encode(map[string]any{"notices": notices, "error": message, "social_revision": revision, "shop_revision": shopRevision, "shop_serial": shopSerial, "shop_key": shopKey})
 }
 
 // Social changes already arrive on the game connection. Expose a local
@@ -92,8 +101,11 @@ func (g *Gateway) observeSocialPacket(token string, generation uint64, packet []
 		Type string `json:"t"`
 		Body struct {
 			Object struct {
-				Command string `json:"_cmd"`
-				Key     string `json:"key"`
+				Command     string `json:"_cmd"`
+				Key         string `json:"key"`
+				MessageType string `json:"messageType"`
+				Text        string `json:"text"`
+				Sender      string `json:"sender"`
 			} `json:"o"`
 		} `json:"b"`
 	}
@@ -104,6 +116,13 @@ func (g *Gateway) observeSocialPacket(token string, generation uint64, packet []
 	defer g.world.mu.Unlock()
 	if g.world.token == token && g.world.generation == generation {
 		command := event.Body.Object.Command
+		notice := event.Body.Object
+		if command == "msg__sendPublicMsg" && notice.MessageType == "alert" && notice.Text != "" {
+			if len(g.world.notices) >= 64 {
+				g.world.notices = g.world.notices[1:]
+			}
+			g.world.notices = append(g.world.notices, worldNotice{Text: notice.Text, Sender: notice.Sender})
+		}
 		if strings.HasPrefix(command, "buddyList__") {
 			g.world.socialRevision++
 		}

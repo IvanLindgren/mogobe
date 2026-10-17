@@ -180,7 +180,7 @@ def test_account_directory_roles_and_give_permissions_change_without_relogin(app
         "/give exp 1000001",
         "/give nope 1",
         "/give exp １２",
-        "/give exp 3 extra",
+        "/give exp 3 extra name",
     ],
 )
 def test_give_rejects_malformed_amounts(app, command):

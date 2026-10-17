@@ -125,14 +125,19 @@ class DesktopBridge:
             self.user32.keybd_event(0x0D,0,0,0)
             self.user32.keybd_event(0x0D,0,2,0)
 
-    def popup_confirm(self):
+    def popup_confirm(self, next_message=None):
         self.wait("window.mogobePopup?.state === 'open' && window.mogobePopup.original",30)
         bounds = self.js("window.registrationPopupPlayer.ruffle().callExternalInterface('getPopupControlBounds','btnConfirm')")
         assert bounds,'Original popup confirmation button missing'
         rect = self.js("window.registrationPopupPlayer.getBoundingClientRect().toJSON()")
         self.click(rect['x']+(bounds['x']+bounds['width']/2)*rect['width']/768,
                    rect['y']+(bounds['y']+bounds['height']/2)*rect['height']/480)
-        self.wait("window.mogobePopup?.state === 'closed'")
+        if next_message is None:
+            self.wait("window.mogobePopup?.state === 'closed'")
+        else:
+            # A queued server announcement can replace the closed help within
+            # one animation frame; verify the new message instead of a transient state.
+            self.wait("window.mogobePopup?.state === 'open' && window.mogobePopup.message.includes("+json.dumps(next_message)+")")
 
     def type_text(self, text):
         # Flash may insert a literal letter for synthetic Ctrl+A under a
@@ -181,6 +186,7 @@ def main():
         client_log = (OUT / "client.log").open("w", encoding="utf-8")
         try:
             env = os.environ.copy()
+            env["MOGOBE_BOOTSTRAP_DEFAULTS"]="false"
             env["MOGOBE_DATABASE_URL"] = "sqlite+aiosqlite:///"+database.as_posix()
             env['PYTHONPATH'] = str(ROOT/'server/.venv/Lib/site-packages')
             # Target port exists only in the config; no --server argument is passed.

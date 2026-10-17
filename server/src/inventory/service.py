@@ -84,10 +84,29 @@ async def available(db, account_id, main_type, categories):
             ),
         )
     )
-    if main_type in (1, 2):
-        query = query.where(Item.main_type == main_type)
-    if isinstance(categories, list) and categories and all(type(i) is int for i in categories):
-        query = query.where(Item.inventory_category.in_(categories))
+
+    # MyCardPopup builds these codes with name.split("_"): the original
+    # SmartFox payload therefore contains strings, including pet main types.
+    def code(value):
+        if type(value) is int:
+            return value
+        if isinstance(value, str) and value.isascii() and value.isdecimal() and len(value) <= 5:
+            return int(value)
+        return None
+
+    if main_type is not None:
+        selected_type = code(main_type)
+        if selected_type is None:
+            return []
+        query = query.where(Item.main_type == selected_type)
+    if categories is not None:
+        if not isinstance(categories, list):
+            return []
+        selected_categories = [code(value) for value in categories]
+        if any(value is None for value in selected_categories):
+            return []
+        if selected_categories:
+            query = query.where(Item.inventory_category.in_(selected_categories))
     return [legacy_item(item, owned.id) for owned, item in (await db.execute(query)).all()]
 
 

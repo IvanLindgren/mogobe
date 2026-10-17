@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     session_hours: int = Field(default=24, ge=1, le=720)
     remembered_session_days: int = Field(default=30, ge=1, le=90)
     registration_minutes: int = Field(default=30, ge=1, le=120)
+    bootstrap_defaults: bool = True
     cookie_secure: bool = False  # The packaged client uses an HTTP loopback gateway.
     server_name: str = "Локальный сервер"
     login_limit: int = Field(default=12, ge=1)

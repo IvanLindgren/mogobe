@@ -23,6 +23,8 @@ AVATARS = "window.player.ruffle().callExternalInterface('getWorldAvatars')"
 def main():
     global OUT
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--commands',action='store_true',help='Public room/shop commands, privileged give targets, original help and global alerts')
+    parser.add_argument('--wardrobe',action='store_true',help='Original inventory wear, multiplayer clothing, reconnect and clipboard photo')
     parser.add_argument('--room-links',action='store_true',help='Terem exhibition, forest tree/cave and port ship doors')
     parser.add_argument('--map-timing',action='store_true',help='First visible map frame, cached graphics and removed birch')
     parser.add_argument('--map-ui',action='store_true',help='Original Bumagland button/island and corrected shop/pool doors')
@@ -37,7 +39,7 @@ def main():
     args = parser.parse_args()
     if args.friends_ui: args.friends_only = True
     if args.rooms_all: args.rooms = True
-    scope = 'room-links' if args.room_links else 'map-timing' if args.map_timing else 'map-ui' if args.map_ui else 'rooms-all' if args.rooms_all else 'rooms' if args.rooms else 'layout' if args.layout else 'friends-ui' if args.friends_ui else 'presence' if args.presence else 'friends' if args.friends_only else 'social' if args.social else 'profiles' if args.profiles else 'multiplayer'
+    scope = 'commands' if args.commands else 'wardrobe' if args.wardrobe else 'room-links' if args.room_links else 'map-timing' if args.map_timing else 'map-ui' if args.map_ui else 'rooms-all' if args.rooms_all else 'rooms' if args.rooms else 'layout' if args.layout else 'friends-ui' if args.friends_ui else 'presence' if args.presence else 'friends' if args.friends_only else 'social' if args.social else 'profiles' if args.profiles else 'multiplayer'
     OUT = ROOT/'verification'/scope
     OUT.mkdir(parents=True, exist_ok=True)
     result = {"suite":scope, "account_count":2, "checks":{}}
@@ -49,6 +51,7 @@ def main():
         with (OUT/"backend.log").open("w",encoding="utf-8") as server_log, (OUT/"client.log").open("w",encoding="utf-8") as client_log:
             try:
                 env = os.environ.copy()
+                env["MOGOBE_BOOTSTRAP_DEFAULTS"]="false"
                 if args.presence: env["MOGOBE_SERVER_NAME"] = "Тестовый мир"
                 env["MOGOBE_DATABASE_URL"] = "sqlite+aiosqlite:///"+(directory/"world.sqlite3").as_posix()
                 env["PYTHONPATH"] = str(ROOT/"server/.venv/Lib/site-packages")
@@ -63,6 +66,19 @@ def main():
                         assert reply.status_code == 201
                         ids.append(reply.json()["id"])
                         assert api.post("/api/auth/logout").status_code == 204
+                if args.commands:
+                    with sqlite3.connect(directory/"world.sqlite3") as db:
+                        db.execute("UPDATE auth_account SET is_admin=1 WHERE username='Player_1'")
+                        db.execute("INSERT INTO shop_item(id,name,main_type,inventory_category,enabled) VALUES (100,'Рубашка',1,4,1)")
+                    with httpx.Client(base_url='http://127.0.0.1:18080') as manager:
+                        assert manager.post('/api/admin/login',json={'username':'Player_1','password':'Player123'}).status_code==200
+                        for key,private in [('open',False),('private',True)]:
+                            assert manager.put('/api/admin/shops/'+key,json={'key':key,'title':key,'admin_only':private}).status_code==200
+                if args.wardrobe:
+                    with sqlite3.connect(directory/"world.sqlite3") as db:
+                        for item in (100,101):
+                            db.execute("INSERT INTO shop_item(id,name,main_type,inventory_category,enabled) VALUES (?,?,1,4,1)",(item,str(item)))
+                            db.execute("INSERT INTO shop_owned_item(account_id,item_id) VALUES (?,?)",(ids[0],item))
                 if args.profiles:
                     with sqlite3.connect(directory/"world.sqlite3") as db:
                         for ident,days in zip(ids,[5,17]):
@@ -115,7 +131,106 @@ def main():
                     avatars = c.js(AVATARS)
                     assert {v["id"] for v in avatars} == set(ids)
                     assert {v["colorId"] for v in avatars} == {3,7}
-                if args.room_links:
+                if args.commands:
+                    def popup_info(c):return c.js("window.registrationPopupPlayer.ruffle().callExternalInterface('getMessageInfo')")
+                    for c,admin in [(a,True),(b,False)]:
+                        c.chat_send('/help')
+                        c.wait("window.mogobePopup?.state==='open' && window.mogobePopup.original===true",30)
+                        message=c.js('window.mogobePopup.message')
+                        assert '/room ключ' in message and '/shop ключ' in message
+                        assert ('/give coins' in message)==admin and ('/alert текст' in message)==admin
+                        panel=popup_info(c)
+                        assert panel['textBottom']<panel['buttonTop'] or panel['textRight']<panel['buttonLeft'],panel
+                        assert panel['panel']['y']>=0 and panel['panel']['y']+panel['panel']['height']<=480,panel
+                        c.capture(scope+('/01-admin-help' if admin else '/02-player-help'))
+                        c.popup_confirm()
+                    result['checks']['original_help_panel_fits_all_lines_and_shows_commands_for_current_role']=True
+                    a.chat_send('/give coins 75 Player_2')
+                    b.wait("fetch('/api/inventory').then(r=>r.json()).then(x=>x.coins===75)")
+                    a.chat_send('/give exp 1500 Player_2')
+                    b.wait("window.player.ruffle().callExternalInterface('getExperienceInfo')?.shown>0")
+                    a.wait("fetch('/api/inventory').then(r=>r.json()).then(x=>x.coins===0)")
+                    assert a.js("window.player.ruffle().callExternalInterface('getExperienceInfo').shown")==0
+                    a.chat_send('/give item 100 Player_2')
+                    b.wait("fetch('/api/inventory').then(r=>r.json()).then(x=>x.items.some(i=>i.typeId===100))")
+                    a.chat_send('/give coins 10')
+                    a.wait("fetch('/api/inventory').then(r=>r.json()).then(x=>x.coins===10)")
+                    a.chat_send('/give exp 500')
+                    a.wait("window.player.ruffle().callExternalInterface('getExperienceInfo')?.shown>0")
+                    a.chat_send('/give item 100')
+                    a.wait("fetch('/api/inventory').then(r=>r.json()).then(x=>x.items.some(i=>i.typeId===100))")
+                    result['checks']['give_coins_item_and_exp_support_target_or_self_and_score_popup_is_recipient_only']=True
+                    b.chat_send('/shop open')
+                    b.wait("window.player.ruffle().callExternalInterface('getShopInfo')?.key==='open'",30)
+                    b.js("window.player.ruffle().callExternalInterface('closeOriginalShop')")
+                    b.chat_send('/shop private')
+                    b.wait(AVATARS+f".find(v=>v.id==={ids[1]})?.speech.includes('недоступен')",20)
+                    assert b.js("window.player.ruffle().callExternalInterface('getShopInfo')")==None
+                    a.chat_send('/shop private')
+                    a.wait("window.player.ruffle().callExternalInterface('getShopInfo')?.key==='private'",30)
+                    a.js("window.player.ruffle().callExternalInterface('closeOriginalShop')")
+                    b.chat_send('/room Novograd')
+                    b.wait("window.mogobeScene?.state==='world' && window.mogobeScene?.room==='novograd'",45)
+                    result['checks']['room_and_shop_public_commands_respect_private_shop_access']=True
+                    b.chat_send('/help');b.wait("window.mogobePopup?.state==='open'",30)
+                    a.chat_send('/alert Проверка объявления всем игрокам')
+                    a.wait("window.mogobePopup?.state==='open' && window.mogobePopup.original && window.mogobePopup.message.includes('Проверка объявления')",30)
+                    assert b.js("window.mogobePopup.message.startsWith('Доступные команды')")
+                    b.popup_confirm(next_message='Проверка объявления')
+                    b.wait("window.mogobePopup?.state==='open' && window.mogobePopup.original && window.mogobePopup.message.includes('Проверка объявления')",30)
+                    b.capture(scope+'/03-alert-in-another-room')
+                    a.popup_confirm();b.popup_confirm()
+                    result['checks']['global_alert_reaches_both_rooms_and_waits_for_open_help_panel']=True
+                elif args.wardrobe:
+                    from PIL import ImageGrab
+                    info="window.player.ruffle().callExternalInterface('getProfileInfo')"
+                    inventory="window.player.ruffle().callExternalInterface('getInventoryInfo')"
+                    def profile_button(name):
+                        box=a.js("window.player.ruffle().callExternalInterface('getProfileControlBounds',"+json.dumps(name)+")")
+                        assert box,name
+                        a.stage_click(box['x']+box['width']/2,box['y']+box['height']/2)
+                    a.control('btnProfile');a.wait(info+"?.visible===true && "+info+"?.popupId===7")
+                    profile_button('btnCamera')
+                    a.wait("window.mogobeLastPhoto?.copied===true",30)
+                    naked=ImageGrab.grabclipboard();assert naked is not None
+                    naked.save(OUT/'01-avatar-before.png')
+                    result['checks']['original_camera_copies_image_to_windows_clipboard']=True
+                    profile_button('mc_4_8_13_14_21')
+                    a.wait(inventory+"?.cells.length===2",30)
+                    cells=a.js(inventory)['cells'];cell=next(i for i in cells if i['typeId']==100)
+                    a.stage_click(cell['x']+cell['width']/2,cell['y']+cell['height']/2)
+                    a.wait("fetch('/api/inventory/equipped').then(r=>r.json()).then(x=>x.items.length===1&&x.items[0].typeId===100)",20)
+                    for c in (a,b): c.wait(AVATARS+f".find(v=>v.id==={ids[0]})?.clothing.some(c=>c.type==='mlIconSItem100')",30)
+                    a.wait(inventory+"?.clothing.some(c=>c.type==='mlBigItem100')",30)
+                    result['checks']['original_inventory_equips_and_both_players_render_clothing']=True
+                    a.js('window.mogobeLastPhoto=null');profile_button('btnCamera')
+                    a.wait("window.mogobeLastPhoto?.copied===true",30)
+                    dressed=ImageGrab.grabclipboard();assert dressed is not None
+                    purple=sum(1 for r,g,b in dressed.convert('RGB').getdata() if r>g*1.25 and b>g*1.25 and r>45 and b>45)
+                    assert purple>500,('Clothing missing from clipboard image',purple)
+                    dressed.save(OUT/'02-avatar-with-shirt.png')
+                    result['checks']['clipboard_portrait_includes_original_clothes']=True
+                    a.capture(scope+'/03-profile-shirt')
+                    profile_button('btnClose');a.wait(info+'===null')
+                    a.stage_click(440,392)
+                    a.wait(AVATARS+f".find(v=>v.id==={ids[0]})?.x>420",20)
+                    b.wait(AVATARS+f".find(v=>v.id==={ids[0]})?.x>420",20)
+                    for c in (a,b): assert any(v['type']=='mlIconWItem100' for v in c.js(AVATARS+f".find(v=>v.id==={ids[0]})")['clothing'])
+                    result['checks']['original_standing_and_walking_timelines_present_on_both_clients']=True
+                    b.capture(scope+'/04-observer-sees-shirt')
+                    a.js('window.onMogobeReconnect()');a.wait("window.mogobeScene?.state==='world' && window.mogobeScene?.room==='infoboard'",60)
+                    a.wait(AVATARS+f".find(v=>v.id==={ids[0]})?.clothing.some(c=>c.type==='mlIconSItem100')",30)
+                    result['checks']['outfit_survives_F5_reconnect_in_same_room']=True
+                    a.control('btnProfile');a.wait(info+'?.visible===true')
+                    a.wait(inventory+"?.clothing.some(c=>c.type==='mlBigItem100')",30)
+                    shirt=next(c for c in a.js(inventory)['clothing'] if c['type']=='mlBigItem100')
+                    a.stage_click(shirt['x']+shirt['width']/2,shirt['y']+shirt['height']/2)
+                    a.wait("fetch('/api/inventory/equipped').then(r=>r.json()).then(x=>x.items.length===0)",20)
+                    for c in (a,b):c.wait(AVATARS+f".find(v=>v.id==={ids[0]})?.clothing.length===0",30)
+                    profile_button('mc_4_8_13_14_21');a.wait(inventory+'?.cells.length===2',20)
+                    result['checks']['click_on_worn_shirt_unequips_for_everyone_and_returns_inventory']=True
+                    profile_button('btnClose')
+                elif args.room_links:
                     navigation={r["key"]:r for r in json.loads((ROOT/"server/src/world/rooms.json").read_text(encoding="utf-8"))["rooms"]}
                     def wait_room(name):
                         a.wait("window.mogobeScene?.state==='world' && window.mogobeScene?.room==="+json.dumps(name.lower()),45)

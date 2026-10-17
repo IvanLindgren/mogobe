@@ -38,7 +38,7 @@
     });
     return ready;
   }
-  window.showMogobePopup = async message => {
+  window.showMogobePopup = async (message, options = {}) => {
     const current = ++generation;
     if(!dialog.open) { restoreFocus=document.activeElement; dialog.showModal(); }
     dialog.setAttribute('aria-label',message);
@@ -46,7 +46,7 @@
     try {
       await load();
       if(current !== generation) return;
-      player.ruffle().callExternalInterface('showMessage',message);
+      player.ruffle().callExternalInterface('showMessage',message,options.kind==='commands');
       window.mogobePopup = {state:'open',message,original:true};
       player.focus();
     } catch {
