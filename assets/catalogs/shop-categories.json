@@ -1,0 +1,136 @@
+{
+  "source": "assets/compat/InventoryCategoryIcons.swf",
+  "source_sha256": "cb32373ca174abfd87243df26717c64e6dfad6b0f90f564aa058ddf804f79899",
+  "original_source": "assets/original/Swf/Assets/Popups/MyProfile.swf",
+  "original_sha256": "a21ed523fc0fd5d337a18b7744d5649234e9aa21ac3c85e3c43969752e0f6c5c",
+  "note": "Original mlClothBtns pictograms from MyProfile.swf shape 52, separated only by SWF masks.",
+  "generator": "tools/build_inventory_category_icons.py",
+  "icons": [
+    {
+      "id": 4,
+      "name": "Верх",
+      "sprite_id": 604,
+      "bounds": [
+        43.05,
+        56.05,
+        6.9,
+        19.9
+      ],
+      "inventory_index": 1,
+      "clip": [
+        32,
+        67,
+        0,
+        28
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Низ",
+      "sprite_id": 605,
+      "bounds": [
+        76.05,
+        90.05,
+        5.9,
+        21.9
+      ],
+      "inventory_index": 2,
+      "clip": [
+        67,
+        102,
+        0,
+        28
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Очки",
+      "sprite_id": 606,
+      "bounds": [
+        181.05,
+        198.05,
+        5.9,
+        18.9
+      ],
+      "inventory_index": 5,
+      "clip": [
+        172,
+        205,
+        0,
+        28
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Обувь",
+      "sprite_id": 607,
+      "bounds": [
+        108.05,
+        130.05,
+        8.9,
+        17.9
+      ],
+      "inventory_index": 3,
+      "clip": [
+        102,
+        137,
+        0,
+        28
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Головные уборы",
+      "sprite_id": 608,
+      "bounds": [
+        6.05,
+        22.05,
+        6.9,
+        18.9
+      ],
+      "inventory_index": 0,
+      "clip": [
+        0,
+        32,
+        0,
+        28
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Аксессуары",
+      "sprite_id": 609,
+      "bounds": [
+        146.05,
+        161.05,
+        6.9,
+        20.9
+      ],
+      "inventory_index": 4,
+      "clip": [
+        137,
+        172,
+        0,
+        28
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Украшения",
+      "sprite_id": 610,
+      "bounds": [
+        146.05,
+        161.05,
+        6.9,
+        20.9
+      ],
+      "inventory_index": 4,
+      "clip": [
+        137,
+        172,
+        0,
+        28
+      ]
+    }
+  ]
+}

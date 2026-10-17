@@ -17,12 +17,13 @@ import (
 )
 
 type Gateway struct {
-	target    *url.URL
-	client    *http.Client
-	Accounts  *accounts.Store
-	resultMu  sync.Mutex
-	lastLogin loginResult
-	world     worldSocket
+	CopyAvatarImage ImageCopier
+	target          *url.URL
+	client          *http.Client
+	Accounts        *accounts.Store
+	resultMu        sync.Mutex
+	lastLogin       loginResult
+	world           worldSocket
 }
 
 func New(serverURL string, timeout time.Duration) *Gateway {
@@ -43,6 +44,23 @@ func (g *Gateway) Middleware(next http.Handler) http.Handler {
 			"/swf/assets/popups/p_7.swf":  "/Swf/Assets/Popups/MyProfile.swf",
 			"/swf/assets/popups/p_8.swf":  "/Swf/Assets/Popups/PlayerProfile.swf",
 			"/swf/assets/popups/p_24.swf": "/Swf/Assets/Popups/FriendsList.swf",
+			"/swf/assets/popups/p_33.swf": "/Swf/Assets/Popups/Shop.swf",
+		}
+		// Administration is a separate application with its own browser session.
+		if lower == "/admin" || strings.HasPrefix(lower, "/admin/") || strings.HasPrefix(lower, "/api/admin/") {
+			http.NotFound(w, r)
+			return
+		}
+		if strings.HasPrefix(lower, "/swf/items/") {
+			parts := strings.Split(strings.TrimPrefix(lower, "/swf/items/"), "/")
+			roles := map[string]string{"display": "Display", "inuse": "InUse", "cats": "Cats"}
+			if len(parts) == 2 && roles[parts[0]] != "" {
+				clone := r.Clone(r.Context())
+				clone.URL.Path = "/api/shop-assets/" + roles[parts[0]] + "/" + parts[1]
+				clone.URL.RawPath = ""
+				g.ServeHTTP(w, clone)
+				return
+			}
 		}
 		if canonical, ok := popupAliases[lower]; ok {
 			clone := r.Clone(r.Context())
@@ -90,6 +108,10 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
+	if r.URL.Path == "/client/clipboard/avatar" {
+		g.avatarClipboard(w, r)
+		return
+	}
 	path := r.URL.Path
 	if strings.HasPrefix(path, "/client/") {
 		g.localAccounts(w, r)
@@ -124,7 +146,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		path = "/legacy/servers" // Old SWF repeats credentials; never forward that query.
 	default:
-		if !strings.HasPrefix(path, "/api/") {
+		if !strings.HasPrefix(path, "/api/") || strings.HasPrefix(path, "/api/admin/") {
 			http.NotFound(w, r)
 			return
 		}
@@ -202,7 +224,11 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, cookie)
 	}
 	w.WriteHeader(response.StatusCode)
-	if _, err = io.Copy(w, io.LimitReader(response.Body, 1024*1024)); err != nil {
+	responseLimit := int64(1024 * 1024)
+	if strings.HasPrefix(path, "/api/shop-assets/") {
+		responseLimit = 8 * 1024 * 1024
+	}
+	if _, err = io.Copy(w, io.LimitReader(response.Body, responseLimit)); err != nil {
 		return
 	}
 }

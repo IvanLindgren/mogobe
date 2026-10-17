@@ -5,7 +5,7 @@ from src.auth.dependencies import CurrentAccount, Database
 from src.auth.models import Account
 from src.profiles import social
 from src.profiles.schemas import MuteUpdate
-from src.profiles.service import find_profile
+from src.profiles.service import find_profile, public_profile
 from src.profiles.social import muted_ids, pending_count, set_mute
 
 router = APIRouter(prefix="/api/social", tags=["social"])
@@ -18,6 +18,18 @@ async def me(account: CurrentAccount, db: Database):
         list(await db.scalars(select(Account.username).where(Account.id.in_(ids)))) if ids else []
     )
     return {"muted_names": names, "pending_requests": await pending_count(db, account.id)}
+
+
+@router.get("/profiles/by-name/{name}")
+async def profile_by_name(name: str, account: CurrentAccount, db: Database):
+    target = await find_profile(db, {"userName": name})
+    return await public_profile(db, target)
+
+
+@router.get("/profiles/{ident}")
+async def profile(ident: int, account: CurrentAccount, db: Database):
+    target = await find_profile(db, {"userId": ident})
+    return await public_profile(db, target)
 
 
 @router.post("/mute")

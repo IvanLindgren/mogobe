@@ -24,6 +24,9 @@ type worldSocket struct {
 	token          string
 	generation     uint64
 	socialRevision uint64
+	shopRevision   uint64
+	shopSerial     uint64
+	shopKey        string
 	error          string
 	url            string
 	origin         string
@@ -75,9 +78,10 @@ func (g *Gateway) worldRuntime(w http.ResponseWriter) {
 func (g *Gateway) worldStatus(w http.ResponseWriter) {
 	g.world.mu.Lock()
 	message, revision := g.world.error, g.world.socialRevision
+	shopRevision, shopSerial, shopKey := g.world.shopRevision, g.world.shopSerial, g.world.shopKey
 	g.world.mu.Unlock()
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]any{"error": message, "social_revision": revision})
+	json.NewEncoder(w).Encode(map[string]any{"error": message, "social_revision": revision, "shop_revision": shopRevision, "shop_serial": shopSerial, "shop_key": shopKey})
 }
 
 // Social changes already arrive on the game connection. Expose a local
@@ -89,16 +93,27 @@ func (g *Gateway) observeSocialPacket(token string, generation uint64, packet []
 		Body struct {
 			Object struct {
 				Command string `json:"_cmd"`
+				Key     string `json:"key"`
 			} `json:"o"`
 		} `json:"b"`
 	}
-	if json.Unmarshal(packet, &event) != nil || event.Type != "xt" || !strings.HasPrefix(event.Body.Object.Command, "buddyList__") {
+	if json.Unmarshal(packet, &event) != nil || event.Type != "xt" {
 		return
 	}
 	g.world.mu.Lock()
 	defer g.world.mu.Unlock()
 	if g.world.token == token && g.world.generation == generation {
-		g.world.socialRevision++
+		command := event.Body.Object.Command
+		if strings.HasPrefix(command, "buddyList__") {
+			g.world.socialRevision++
+		}
+		if command == "shop__changed" {
+			g.world.shopRevision++
+		}
+		if command == "shop__open" {
+			g.world.shopSerial++
+			g.world.shopKey = event.Body.Object.Key
+		}
 	}
 }
 

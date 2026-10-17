@@ -332,7 +332,7 @@ def main():
                     assert all(not frame['luxuryVisible'] and not frame['luxuryIconVisible'] for frame in frames),[frame for frame in frames if frame['luxuryVisible'] or frame['luxuryIconVisible']]
                     assert any(frame['visible'] for frame in frames),"Profile never became visible"
                     counters = a.js(profile+'.counters')
-                    expected = dict(zip(['txtNewMsgs','txtFriends','txtAge','txtAmount_1'],[182.4,216.9,252.8,289.1]))
+                    expected = dict(zip(['txtNewMsgs','txtFriends','txtAge','txtAmount_1'],[182.125,218.125,254.125,290.125]))
                     assert len(counters)==4,counters
                     assert all(abs(v['center']-expected[v['name']])<.2 and v['align']=='center' for v in counters),counters
                     a.capture('layout/02-profile-centered-counters')

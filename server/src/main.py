@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from time import perf_counter
@@ -5,15 +6,19 @@ from time import perf_counter
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from src.auth.router import router as auth_router
 from src.auth.service import AttemptLimiter
-from src.config import Settings
+from src.config import ROOT, Settings
 from src.database import make_engine
+from src.inventory.router import router as inventory_router
 from src.legacy.router import router as legacy_router
 from src.legacy.socket import router as socket_router
 from src.profiles.router import router as social_router
+from src.shops.graphics import router as shop_graphics_router
+from src.shops.router import router as shops_router
 from src.world.hub import WorldHub
 from src.world.router import router as world_router
 
@@ -30,6 +35,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         await engine.dispose()
 
     app = FastAPI(title="Mogobe server", version="0.1.0", lifespan=lifespan)
+    app.state.commerce_lock = asyncio.Lock()
     app.state.settings = settings
     app.state.engine = engine
     app.state.world = WorldHub(settings.server_name)
@@ -73,6 +79,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(socket_router)
     app.include_router(world_router)
     app.include_router(social_router)
+    app.include_router(shops_router)
+    app.include_router(inventory_router)
+    app.include_router(shop_graphics_router)
+    app.mount(
+        "/admin/runtime", StaticFiles(directory=ROOT.parent / "assets/ruffle"), name="admin-ruffle"
+    )
     return app
 
 

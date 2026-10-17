@@ -49,6 +49,7 @@ func main() {
 		fatal("Не удалось прочитать сохранённых могоби.", err)
 	}
 	proxy.Accounts = store
+	proxy.CopyAvatarImage = copyAvatarImage
 	closeSocket, err := proxy.StartWorldSocket(*preview)
 	if err != nil {
 		fatal("Не удалось создать локальное подключение к миру.", err)

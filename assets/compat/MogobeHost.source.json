@@ -3,5 +3,5 @@
   "source": "tools/host/MogobeHost.as",
   "compiler": "JPEXS 26.3.0",
   "role": "Load original login, saved-avatar picker, registration alerts, Main, world map, rooms and avatar; retain original preloader until room, panel and avatar are ready",
-  "sha256": "229a01451530b6ef54eeb3f6662142736e01446c3563fac1714c1924f261bee8"
+  "sha256": "7c03f9b3a854cc251b2e7935880a8586f7f0c719282b3ab4167763eb9328d888"
 }

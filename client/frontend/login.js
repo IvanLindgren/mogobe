@@ -1,3 +1,58 @@
+let profileFetchSequence=0;
+async function refreshOriginalProfile(){
+  const info=window.player?.ruffle().callExternalInterface('getProfileInfo');
+  if(!info || (!(info.userId>0) && !info.userName))return;
+  const sequence=++profileFetchSequence;
+  try{
+    const target=info.userId>0?String(info.userId):'by-name/'+encodeURIComponent(info.userName);
+    const response=await fetch('/api/social/profiles/'+target,{cache:'no-store'});
+    if(!response.ok)return;
+    const data=await response.json();
+    if(sequence===profileFetchSequence)window.player?.ruffle().callExternalInterface('setProfileProgress',data);
+  }catch{}
+}
+window.onMogobeAvatarPhoto = async jpeg => {
+  try {
+    const response = await fetch('/client/clipboard/avatar', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jpeg})});
+    if(!response.ok) throw new Error('Не удалось скопировать изображение в буфер обмена.');
+    window.mogobeLastPhoto = {copied:true,...await response.json()};
+  } catch(error) { window.mogobeLastPhoto = {copied:false};showMogobePopup(error.message); }
+};
+window.onMogobeProfileShown=()=>{setTimeout(()=>refreshOriginalProfile(),0);};
+let activeShopKey = '', shopOpenSeen = 0, shopRevisionSeen = 0, shopFetchSequence = 0;
+window.onMogobeShopClosed = () => { activeShopKey='';shopFetchSequence++; };
+async function openMogobeShop(key, refresh=false) {
+  const sequence=++shopFetchSequence;
+  try {
+    const response=await fetch('/api/shops/'+encodeURIComponent(key),{cache:'no-store'});
+    const data=await response.json();
+    if(!response.ok) throw Error(typeof data.detail==='string'?data.detail:'Магазин недоступен.');
+    if(sequence!==shopFetchSequence || leavingWorld) return;
+    if(refresh) window.player?.ruffle().callExternalInterface('refreshOriginalShop',data);
+    else {
+      const opened=window.player?.ruffle().callExternalInterface('openOriginalShop',data);
+      if(!opened) throw Error('Закройте открытое окно и повторите команду магазина.');
+      activeShopKey=key;
+    }
+  } catch(error) {
+    if(refresh) window.player?.ruffle().callExternalInterface('closeOriginalShop');
+    showMogobePopup(error.message);
+  }
+}
+window.onMogobeShopBuy = async (key,itemId,price) => {
+  try {
+    const response=await fetch('/api/shops/'+encodeURIComponent(key)+'/buy',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({item_id:itemId,expected_price:price})});
+    const data=await response.json();
+    if(!response.ok) throw Error(typeof data.detail==='string'?data.detail:'Покупка не выполнена.');
+    window.player?.ruffle().callExternalInterface('finishShopPurchase',true);
+    await openMogobeShop(key,true);
+  } catch(error) {
+    window.player?.ruffle().callExternalInterface('finishShopPurchase',false);
+    showMogobePopup(error.message);
+    await openMogobeShop(key,true);
+  }
+};
+
 window.openRegistWindow = () => location.assign('/Registration2.aspx');
 window.setLangAndReload = () => location.reload();
 for (const name of ['onPageView', 'onGemiusPageView', 'onSetVar', 'logData', 'onOpenWebWindow']) window[name] = () => {};
@@ -125,6 +180,17 @@ async function watchWorld() {
         window.player?.remove();
         location.assign('/');
         return;
+      }
+      if(window.mogobeScene?.state === 'world') {
+        if((status.shop_serial??0)!==shopOpenSeen) {
+          shopOpenSeen=status.shop_serial??0;
+          if(status.shop_key) await openMogobeShop(status.shop_key);
+        }
+        if((status.shop_revision??0)!==shopRevisionSeen) {
+          shopRevisionSeen=status.shop_revision??0;
+          if(activeShopKey) await openMogobeShop(activeShopKey,true);
+          await refreshOriginalProfile();
+        }
       }
       const version = status.social_revision ?? 0;
       if(window.mogobeScene?.state === 'world' && version !== seenSocialVersion && Date.now() >= socialRetryAt) {
@@ -266,7 +332,7 @@ async function waitForServer() {
     await player.ruffle().load({url:'/compat/MogobeHost.swf', base:location.origin+'/',
       socketProxy:[{host:'127.0.0.1',port:9339,proxyUrl:runtime.socket_url}],
       parameters:{Lang:'5',appVer:'20130305',serverList:'true',debug:'false',
-        httpPort:location.port || '80',mainDomain:location.host,mediaURL:location.origin}});
+        httpPort:location.port || '80',mainDomain:location.host,mediaURL:''}});
     window.mogobeReady = true;
   } catch(error) { showNotice(`Не удалось загрузить игру: ${error.message}`); }
 })();

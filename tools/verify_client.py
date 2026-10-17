@@ -5,6 +5,8 @@ import subprocess
 import sys
 
 SUITES = {
+    "shops": ("verify_shops.py", []),
+    "shop-admin": ("verify_shop_admin.py", []),
     "room-links": ("verify_multiplayer.py", ["--room-links"]),
     "map-timing": ("verify_multiplayer.py", ["--map-timing"]),
     "map-ui": ("verify_multiplayer.py", ["--map-ui"]),

@@ -1,4 +1,6 @@
 package {
+    import flash.display.BitmapData;
+    import flash.utils.ByteArray;
     import flash.display.DisplayObject;
     import flash.display.DisplayObjectContainer;
     import flash.display.Loader;
@@ -25,6 +27,10 @@ package {
     public dynamic class MogobeHost extends MovieClip {
         private var gameLoader:Loader;
         private var originalPreloader:Loader;
+        private var scoreSignsShown:int = 0;
+        private var lastScoreSign:String = "";
+        private var profileIconLoader:Loader;
+        private var profileIconDomain:ApplicationDomain;
         private var mapAssetsLoader:Loader;
         private var mapAssetsDomain:ApplicationDomain;
         private var mapAssetsError:String = "";
@@ -71,6 +77,7 @@ package {
             gameLoader.addEventListener(KeyboardEvent.KEY_DOWN, worldChatKey, true, 100);
             gameLoader.addEventListener(MouseEvent.CLICK, worldChatClick, true, 100);
             gameLoader.addEventListener(MouseEvent.CLICK, socialClick, true, 200);
+            gameLoader.addEventListener(MouseEvent.CLICK, avatarCameraClick, true, 300);
             gameLoader.addEventListener(MouseEvent.MOUSE_OVER, friendMouseOver, true, 200);
             gameLoader.addEventListener(MouseEvent.MOUSE_OUT, friendMouseOut, true, 200);
             addChild(gameLoader);
@@ -92,6 +99,13 @@ package {
             ExternalInterface.addCallback("setServerPresence", setServerPresence);
             ExternalInterface.addCallback("getServerInfo", getServerInfo);
             ExternalInterface.addCallback("getProfileInfo", getProfileInfo);
+            ExternalInterface.addCallback("setProfileProgress", setProfileProgress);
+            ExternalInterface.addCallback("getExperienceInfo", getExperienceInfo);
+            ExternalInterface.addCallback("openOriginalShop",openOriginalShop);
+            ExternalInterface.addCallback("refreshOriginalShop",refreshOriginalShop);
+            ExternalInterface.addCallback("finishShopPurchase",finishShopPurchase);
+            ExternalInterface.addCallback("closeOriginalShop",closeOriginalShop);
+            ExternalInterface.addCallback("getShopInfo",getShopInfo);
             ExternalInterface.addCallback("getWorldPanelInfo", getWorldPanelInfo);
             ExternalInterface.addCallback("getWorldMapInfo", getWorldMapInfo);
             ExternalInterface.addCallback("getChatMenuItems", getChatMenuItems);
@@ -107,6 +121,7 @@ package {
             originalPreloader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadOriginalLogin);
             originalPreloader.load(new URLRequest("/compat/OriginalPreloader.swf"));
             preloadWorldMap();
+            preloadProfileIcons();
         }
 
         private function loadRegistrationPopup():void {
@@ -642,24 +657,40 @@ package {
             for (var i:int = 0; i < view.numChildren; i++) {
                 var child:DisplayObject = view.getChildAt(i);
                 if (Math.abs(child.x-303)<0.2 && Math.abs(child.y-338.5)<0.2 && child.width<40 && child.height<40) child.visible = false;
-                // Its green oval is baked into shape 144 along with the other
-                // counters. Clip only the luxury part; keep coins/days/friends.
+                // Original shape 144 contains all five counter pictograms.
+                // Keep the original vector paths and isolate the four used
+                // icons with masks, then center each over its own counter.
                 var bounds:Rectangle = child.getBounds(view);
-                if (child is Shape && Math.abs(bounds.x-159.9)<0.2 && Math.abs(bounds.y-337.5)<0.2 && Math.abs(bounds.width-170)<0.2 && child.mask == null) {
-                    var currencyMask:Shape = new Shape();
-                    currencyMask.name = "mogobeCurrencyMask";
-                    currencyMask.graphics.beginFill(0);
-                    currencyMask.graphics.drawRect(0,0,296,480);
-                    currencyMask.graphics.endFill();
-                    view.addChild(currencyMask);
-                    child.mask = currencyMask;
-                    // Center the remaining four original icons in the card.
-                    child.x += 13;
-                    currencyMask.x = 13;
+                if (child is Shape && child != Object(view).mogobeProfileIconSource &&
+                    Math.abs(bounds.x-159.9)<0.2 && Math.abs(bounds.y-337.5)<0.2 && Math.abs(bounds.width-170)<0.2 &&
+                    Object(view).mogobeProfileIconsPrepared != true && profileIconDomain != null) {
+                    Object(view).mogobeProfileIconSource = child;
+                    child.visible = false;
+                    Object(view).mogobeProfileIconsPrepared = true;
+                    var cuts:Array = [159.9,190,225,261,296];
+                    var authored:Array = [168.9,203.4,239.4,275.4];
+                    var targets:Array = [182.125,218.125,254.125,290.125];
+                    for (var iconIndex:int = 0; iconIndex < 4; iconIndex++) {
+                        var holder:Sprite = new Sprite();
+                        holder.name = "mogobeProfileIcon"+iconIndex;
+                        holder.mouseEnabled = false;
+                        holder.mouseChildren = false;
+                        var iconClass:Class = profileIconDomain.getDefinition("MogobeProfileCounterArtwork") as Class;
+                        var icon:DisplayObject = new iconClass() as DisplayObject;
+                        holder.addChild(icon);
+                        var iconMask:Shape = new Shape();
+                        iconMask.graphics.beginFill(0);
+                        iconMask.graphics.drawRect(cuts[iconIndex],330,cuts[iconIndex+1]-cuts[iconIndex],32);
+                        iconMask.graphics.endFill();
+                        holder.addChild(iconMask);
+                        icon.mask = iconMask;
+                        holder.x = targets[iconIndex]-authored[iconIndex];
+                        view.addChild(holder);
+                    }
                 }
             }
             var keys:Array = ["txtNewMsgs","txtFriends","txtAge","txtAmount_1"];
-            var centers:Array = [182.4,216.9,252.8,289.1];
+            var centers:Array = [182.125,218.125,254.125,290.125];
             for (var j:int = 0; j < keys.length; j++) {
                 var field:TextField = profileField(view,keys[j]);
                 // Wait for the original FontClass replacement; moving the
@@ -700,12 +731,32 @@ package {
         private function updateProfileCounters():void {
             var popup:Object = currentProfile();
             if (popup == null) return;
+            var targetId:int = int(popup.Data.userId);
+            var targetName:String = popup.Data.userName == null ? "" : String(popup.Data.userName);
+            var targetKey:String = targetId > 0 ? "id:"+targetId : targetName;
+            if (targetKey != "" && Object(popup.baseView).mogobeProfileRequestedKey != targetKey) {
+                Object(popup.baseView).mogobeProfileRequestedKey = targetKey;
+                ExternalInterface.call("onMogobeProfileShown");
+            }
+            if (Number(Object(popup.baseView).mogobeScoreValue) >= 1024000) {
+                var maxIndicator:MovieClip = popup.baseView.getChildByName("mogobeLevelIndicator") as MovieClip;
+                if (maxIndicator != null) {
+                    maxIndicator.gotoAndStop("ScoreLevel_11");
+                    var maxFill:MovieClip = findNamed(maxIndicator,"mc",0) as MovieClip;
+                    if (maxFill != null) maxFill.gotoAndStop(maxFill.totalFrames);
+                }
+            }
+            var adminMark:DisplayObject = findNamed(popup.baseView,"mcMember",0);
+            if (adminMark != null) {
+                if (adminMark is flash.display.InteractiveObject) flash.display.InteractiveObject(adminMark).mouseEnabled = false;
+                if (adminMark is DisplayObjectContainer) DisplayObjectContainer(adminMark).mouseChildren = false;
+            }
             if (popup.PopupId == 7) {
                 hideLuxuryCurrency(popup.baseView);
                 var view:Object = popup.baseView;
                 if (view.mogobeProfilePreparing == true) {
                     var coins:TextField = profileField(popup.baseView,"txtAmount_1");
-                    if (coins != null && coins != view.txtAmount_1) {
+                    if (coins != null && coins != view.txtAmount_1 && view.mogobeProfileIconsPrepared == true) {
                         view.mogobeProfilePreparing = false;
                         view.visible = true;
                     }
@@ -732,6 +783,56 @@ package {
             }
         }
 
+        private function experienceLevel(score:int):int {
+            var thresholds:Array = [1000,2000,4000,8000,16000,32000,64000,124000,256000,512000,1024000];
+            var level:int = 1;
+            for each (var threshold:int in thresholds) if (score >= threshold) level++;
+            return level;
+        }
+
+        public function setProfileProgress(data:Object):void {
+            var popup:Object = currentProfile();
+            if (popup == null || profileIconDomain == null) return;
+            var targetId:int = int(popup.Data.userId);
+            if (targetId > 0 && targetId != int(data.userId)) return;
+            if (targetId <= 0 && String(popup.Data.userName).toLowerCase() != String(data.userName).toLowerCase()) return;
+            var view:Object = popup.baseView;
+            view.mogobeProfileUserId = int(data.userId);
+            var admin:DisplayObject = findNamed(popup.baseView,"mcMember",0);
+            if (admin != null) admin.visible = Boolean(data.isAdmin);
+            var score:int = int(data.score);
+            if (view.mogobeScoreValue === score) return;
+            var original:MovieClip = findNamed(popup.baseView,"mcScore",0) as MovieClip;
+            if (original == null) return;
+            original.visible = false;
+            original.mouseEnabled = false;
+            original.mouseChildren = false;
+            var indicator:MovieClip = popup.baseView.getChildByName("mogobeLevelIndicator") as MovieClip;
+            if (indicator == null) {
+                var cls:Class = profileIconDomain.getDefinition("MogobeScoreIndicator") as Class;
+                indicator = new cls() as MovieClip;
+                indicator.name = "mogobeLevelIndicator";
+                indicator.transform.matrix = original.transform.matrix;
+                popup.baseView.addChild(indicator);
+                indicator.addEventListener(Event.REMOVED_FROM_STAGE,function(event:Event):void {
+                    if (view.mogobeExperienceController != null) view.mogobeExperienceController.disableEvents();
+                });
+            }
+            if (view.mogobeExperienceController != null) view.mogobeExperienceController.disableEvents();
+            cls = ApplicationDomain.currentDomain.getDefinition("worlds4u.view.UserExperience") as Class;
+            view.mogobeExperienceController = new cls(indicator,score);
+            if (score >= 1024000) {
+                indicator.gotoAndStop("ScoreLevel_11");
+                var fill:MovieClip = findNamed(indicator,"mc",0) as MovieClip;
+                if (fill != null) fill.gotoAndStop(fill.totalFrames);
+            }
+            view.mogobeScoreValue = score;
+        }
+
+        public function getExperienceInfo():Object {
+            return {shown:scoreSignsShown,last:lastScoreSign};
+        }
+
         public function getProfileInfo():Object {
             var popup:Object = currentProfile();
             if (popup == null) return null;
@@ -748,13 +849,24 @@ package {
                 var rect:Rectangle = counter.getBounds(view);
                 counters.push({name:key,center:rect.x+rect.width/2,align:counter.defaultTextFormat.align});
             }
+            var iconBoxes:Array = [];
+            for (var iconIndex:int = 0; iconIndex < 4; iconIndex++) {
+                var holder:DisplayObjectContainer = view.getChildByName("mogobeProfileIcon"+iconIndex) as DisplayObjectContainer;
+                if (holder != null && holder.numChildren == 2) {
+                    var box:Rectangle = holder.getChildAt(1).getBounds(this);
+                    iconBoxes.push({x:box.x,y:box.y,width:box.width,height:box.height});
+                }
+            }
             var luxuryIconVisible:Boolean = false;
             for (var i:int = 0; i < view.numChildren; i++) {
                 var child:DisplayObject = view.getChildAt(i);
                 if (Math.abs(child.x-303)<0.2 && Math.abs(child.y-338.5)<0.2 && child.width<40 && child.height<40 && child.visible) luxuryIconVisible = true;
             }
-            return {visible:view.visible,counters:counters,luxuryIconVisible:view.visible && luxuryIconVisible,popupId:popup.PopupId, userId:popup.Data.userId, userName:nick == null ? "" : nick.text,
+            var langClass:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.model.LanguageManager") as Class;
+            var numericLevel:int = experienceLevel(int(Object(view).mogobeScoreValue));
+            return {levelName:Object(langClass).getInstance().getMessage(numericLevel == 12 ? 0 : numericLevel,"UserExperience"),score:Object(view).mogobeScoreValue,level:numericLevel,iconBoxes:iconBoxes,visible:view.visible,counters:counters,luxuryIconVisible:view.visible && luxuryIconVisible,popupId:popup.PopupId, userId:Object(view).mogobeProfileUserId == null ? int(popup.Data.userId) : int(Object(view).mogobeProfileUserId), userName:popup.Data.userName != null ? String(popup.Data.userName) : nick == null ? "" : nick.text,
                 days:age == null ? "" : age.text, friends:friends == null ? "" : friends.text, inventory:inventory,
+                adminBadge:findNamed(view,"mcMember",0) != null && findNamed(view,"mcMember",0).visible,
                 muted:nick != null && displayedMute(nick.text),
                 mutePending:nick != null && pendingMutes["$"+nick.text] != null,
                 muteFrame:findNamed(view,"btnBend",0) is MovieClip ? MovieClip(findNamed(view,"btnBend",0)).currentLabel : "",
@@ -770,9 +882,64 @@ package {
             return {x:bounds.x, y:bounds.y, width:bounds.width, height:bounds.height};
         }
 
+        private function avatarCameraClick(event:MouseEvent):void {
+            var popup:Object = currentProfile();
+            if (popup == null || popup.PopupId != 7) return;
+            var camera:DisplayObject = findNamed(popup.baseView,"btnCamera",0);
+            var target:DisplayObject = event.target as DisplayObject;
+            while (target != null && target != camera) target = target.parent;
+            if (target == null) return;
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            try {
+                var holder:DisplayObjectContainer = findNamed(popup.baseView,"mcAvatarHolder",0) as DisplayObjectContainer;
+                var avatar:DisplayObject = findAvatarPortrait(holder);
+                if (avatar == null) return;
+                var bounds:Rectangle = avatar.getBounds(avatar);
+                var scale:Number = 2;
+                var image:BitmapData = new BitmapData(Math.ceil(bounds.width*scale)+24,Math.ceil(bounds.height*scale)+24,false,0xFFFFFF);
+                image.draw(avatar,new Matrix(scale,0,0,scale,12-bounds.x*scale,12-bounds.y*scale));
+                var encoder:Class = ApplicationDomain.currentDomain.getDefinition("com.adobe.images.JPGEncoder") as Class;
+                var bytes:ByteArray = new encoder(90).encode(image);
+                image.dispose();
+                ExternalInterface.call("onMogobeAvatarPhoto",encodePhoto(bytes));
+            } catch(error:Error) { ExternalInterface.call("showMogobePopup","Не удалось получить изображение могоби: "+error.message); }
+        }
+
+        private function findAvatarPortrait(node:DisplayObject):DisplayObject {
+            if (node == null) return null;
+            if (getQualifiedClassName(node) == "mlCardAvatar") return node;
+            var holder:DisplayObjectContainer = node as DisplayObjectContainer;
+            for (var i:int=0;holder != null && i<holder.numChildren;i++) {
+                var result:DisplayObject = findAvatarPortrait(holder.getChildAt(i));
+                if (result != null) return result;
+            }
+            return null;
+        }
+
+        private function encodePhoto(bytes:ByteArray):String {
+            var alphabet:String="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+            var result:String="";
+            bytes.position=0;
+            while(bytes.bytesAvailable>0) {
+                var a:int=bytes.readUnsignedByte();
+                var b:int=bytes.bytesAvailable>0?bytes.readUnsignedByte():-1;
+                var c:int=bytes.bytesAvailable>0?bytes.readUnsignedByte():-1;
+                result+=alphabet.charAt(a>>2)+alphabet.charAt(((a&3)<<4)|(b<0?0:b>>4));
+                result+=b<0?"=":alphabet.charAt(((b&15)<<2)|(c<0?0:c>>6));
+                result+=c<0?"=":alphabet.charAt(c&63);
+            }
+            return result;
+        }
+
         private function originalDisplayAdded(event:Event):void {
             var view:DisplayObject = event.target as DisplayObject;
             prepareRoomView(view);
+            if (view != null && getQualifiedClassName(view) == "mlWorldScoreSign") {
+                scoreSignsShown++;
+                lastScoreSign = collectText(view);
+            }
+            if (view is DisplayObjectContainer && getQualifiedClassName(view) == "mlPopup_33") prepareShopLayout(view as DisplayObjectContainer);
             if (view != null && getQualifiedClassName(view) == "mlPopup_3") {
                 // Hold the original popup before its first paint until the
                 // cached island/button have been attached in this same frame.
@@ -805,7 +972,18 @@ package {
             refreshFriendsFonts();
             updateProfileCounters();
             updateWorldPanel();
+            updateShopLayout();
             updateWorldMap();
+        }
+
+        private function preloadProfileIcons():void {
+            if (profileIconLoader != null) return;
+            profileIconLoader = new Loader();
+            profileIconLoader.contentLoaderInfo.addEventListener(Event.COMPLETE,function(event:Event):void {
+                profileIconDomain = profileIconLoader.contentLoaderInfo.applicationDomain;
+                updateProfileCounters();
+            });
+            profileIconLoader.load(new URLRequest("/compat/ProfileCounterIcons.swf"),new LoaderContext(false,new ApplicationDomain()));
         }
 
         private function preloadWorldMap():void {
@@ -893,6 +1071,32 @@ package {
                 islandVisible:island != null && island.visible,
                 buttonFrame:button == null ? "" : button.currentLabel,
                 buttonFrames:button == null ? 0 : button.totalFrames};
+        }
+
+        private function prepareShopLayout(view:DisplayObjectContainer):void {
+            if (view == null || Object(view).mogobeShopPrepared == true) return;
+            var panel:DisplayObjectContainer = findNamed(view,"mcShop",0) as DisplayObjectContainer;
+            if (panel == null) return;
+            Object(view).mogobeShopPrepared = true;
+            var luxury:DisplayObject = panel.getChildByName("txtAmount_2");
+            if (luxury != null) luxury.visible = false;
+            var amount:DisplayObject = panel.getChildByName("txtAmount_1");
+            var coins:DisplayObject = panel.getChildByName("mcCoinsIcon");
+            if (amount != null) amount.y += 20;
+            if (coins != null) coins.y += 20;
+            for (var i:int = 0; i < panel.numChildren; i++) {
+                var child:DisplayObject = panel.getChildAt(i);
+                var bounds:Rectangle = child.getBounds(panel);
+                // Luxury icon and its authored shadow are separate objects.
+                if ((Math.abs(child.x-173.05)<0.2 && Math.abs(child.y-295.85)<0.2) ||
+                    (child is Shape && Math.abs(bounds.x-178.4)<0.2 && Math.abs(bounds.y-294.8)<0.2)) child.visible = false;
+                if (child is Shape && Math.abs(bounds.x-180.1)<0.2 && Math.abs(bounds.y-267.3)<0.2) child.y += 20;
+            }
+        }
+
+        private function updateShopLayout():void {
+            var popup:Object = currentPopup();
+            if (popup != null && getQualifiedClassName(popup.baseView) == "mlPopup_33") prepareShopLayout(popup.baseView);
         }
 
         private function updateWorldPanel():void {
@@ -1235,5 +1439,136 @@ package {
                 ExternalInterface.call("onMogobeSceneState", state, room, panelReady, avatarReady);
             }
         }
+        private var shopPopup:Object;
+        private var shopModel:flash.events.EventDispatcher;
+        private var shopData:Object;
+
+        public function openOriginalShop(data:Object):Boolean {
+            if (mainClip == null || worldAvatar == null) return false;
+            var existing:Object = currentPopup();
+            if (existing != null && existing != shopPopup) return false;
+            if (shopPopup != null && shopPopup.baseView.stage != null) {
+                if (shopData.key == data.key && shopData.kind == data.kind) {
+                    refreshOriginalShop(data);
+                    return true;
+                }
+                closeOriginalShop();
+            }
+            shopData = data;
+            shopModel = new flash.events.EventDispatcher();
+            var cls:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.view.popups.PopupsManeger") as Class;
+            shopPopup = Object(cls).getInstance().showPopWithLoad(33,{popupId:data.kind == "clothing" ? 2 : 6},shopModel);
+            shopPopup.addEventListener("STORE_DATA_EVT",shopRequest);
+            shopPopup.addEventListener("ASK_DATA_EVT",shopRequest);
+            shopPopup.addEventListener("BUY_ITEM_EVT",shopRequest);
+            shopPopup.addEventListener(Event.CLOSE,shopClosed);
+            return true;
+        }
+
+        private function shopClosed(event:Event):void {
+            shopPopup = null;
+            shopModel = null;
+            shopData = null;
+            ExternalInterface.call("onMogobeShopClosed");
+        }
+
+        private function shopRequest(event:Event):void {
+            if (shopData == null) return;
+            var cls:Class;
+            if (event.type == "STORE_DATA_EVT") {
+                var store:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.model.data.StoreTO") as Class;
+                cls = ApplicationDomain.currentDomain.getDefinition("worlds4u.events.RoomEvent") as Class;
+                shopModel.dispatchEvent(new cls("STORE_DATA_EVT",new store(shopData),"rooms__getStoreData"));
+            } else if (event.type == "ASK_DATA_EVT") {
+                sendShopUser();
+            } else if (event.type == "BUY_ITEM_EVT") {
+                var id:int = int(Object(event).Data);
+                var price:int = -1;
+                for each (var item:Object in shopData.items) if (int(item.typeId) == id) price = int(item.price);
+                ExternalInterface.call("onMogobeShopBuy",shopData.key,id,price);
+            }
+        }
+
+        private function sendShopUser():void {
+            if (shopData == null || shopModel == null) return;
+            var userClass:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.model.data.UserTO") as Class;
+            var user:Object = new userClass(int(shopData.user.userId),String(shopData.user.userName),true);
+            var values:Array = [];
+            for (var key:String in shopData.user) values[key] = shopData.user[key];
+            values["mo_1"] = shopData.coins;
+            user.Varibales = values;
+            var cls:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.events.AvatarEvent") as Class;
+            shopModel.dispatchEvent(new cls("ASK_DATA_EVT","user__getUserTO",user,int(shopData.user.userId)));
+        }
+
+        public function refreshOriginalShop(data:Object):void {
+            if (shopPopup == null || shopData == null || data.key != shopData.key) return;
+            shopData = data;
+            var store:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.model.data.StoreTO") as Class;
+            var cls:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.events.RoomEvent") as Class;
+            shopModel.dispatchEvent(new cls("STORE_DATA_EVT",new store(data),"rooms__getStoreData"));
+            sendShopUser();
+        }
+
+        public function finishShopPurchase(success:Boolean):void {
+            if (shopModel == null) return;
+            var cls:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.events.AvatarEvent") as Class;
+            shopModel.dispatchEvent(new cls("BUY_ITEM_EVT","user__buyItem",{status:success,msgId:-1},-1));
+        }
+
+        public function closeOriginalShop():void {
+            if (shopPopup == null) return;
+            try { shopPopup.disableEvents(); } catch (error:Error) {}
+            shopPopup.dispatchEvent(new Event(Event.CLOSE));
+        }
+
+        private function countShopGraphics(node:DisplayObject):int {
+            var type:String = getQualifiedClassName(node);
+            var result:int = type.indexOf("btnItem") == 0 || type.indexOf("mlBigItem") == 0 ? 1 : 0;
+            var holder:DisplayObjectContainer = node as DisplayObjectContainer;
+            if (holder != null) for (var i:int = 0; i < holder.numChildren; i++) result += countShopGraphics(holder.getChildAt(i));
+            return result;
+        }
+
+        private function findShopGraphic(node:DisplayObject, prefix:String):DisplayObject {
+            if (getQualifiedClassName(node).indexOf(prefix) == 0) return node;
+            var holder:DisplayObjectContainer = node as DisplayObjectContainer;
+            if (holder != null) for (var i:int = 0; i < holder.numChildren; i++) {
+                var found:DisplayObject = findShopGraphic(holder.getChildAt(i),prefix);
+                if (found != null) return found;
+            }
+            return null;
+        }
+
+        private function shopCells(node:DisplayObject, result:Array):void {
+            if (getQualifiedClassName(node) == "worlds4u.common.uiControls.DataGrid::GridCellStore") {
+                var data:Object = Object(node).Data;
+                var bounds:Rectangle = node.getBounds(this);
+                var hit:flash.geom.Point = globalToLocal(node.localToGlobal(new flash.geom.Point(42.85,31.95)));
+                var artwork:DisplayObject = findShopGraphic(node,"btnItem");
+                var artBounds:Rectangle = artwork == null ? null : artwork.getBounds(node);
+                result.push({art:artBounds == null ? null : {x:artBounds.x,y:artBounds.y,width:artBounds.width,height:artBounds.height},hitX:hit.x,hitY:hit.y,id:int(data.TypeId),price:int(data.Price),available:Boolean(data.InStock),
+                    x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height,
+                    graphics:countShopGraphics(node)});
+            }
+            var holder:DisplayObjectContainer = node as DisplayObjectContainer;
+            if (holder != null) for (var i:int = 0; i < holder.numChildren; i++) shopCells(holder.getChildAt(i),result);
+        }
+
+        public function getShopInfo():Object {
+            if (shopPopup == null || shopData == null) return null;
+            var cells:Array = [];
+            shopCells(shopPopup.baseView,cells);
+            var preview:DisplayObject = findNamed(shopPopup.baseView,"mcAvatarBig",0);
+            var panel:DisplayObjectContainer = findNamed(shopPopup.baseView,"mcShop",0) as DisplayObjectContainer;
+            var luxury:DisplayObject = panel == null ? null : panel.getChildByName("txtAmount_2");
+            var amount:DisplayObject = panel == null ? null : panel.getChildByName("txtAmount_1");
+            return {luxuryVisible:luxury != null && luxury.visible,coinY:amount == null ? 0 : amount.y,
+                key:shopData.key,title:shopData.title,kind:shopData.kind,coins:shopData.coins,
+                itemCount:shopData.items.length,items:cells,text:collectText(shopPopup.baseView),
+                visible:shopPopup.baseView.stage != null,avatar:preview != null && preview.visible};
+        }
+
+
     }
 }

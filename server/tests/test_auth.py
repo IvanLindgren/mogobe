@@ -6,11 +6,11 @@ from xml.etree.ElementTree import fromstring
 import httpx
 import pytest
 from alembic.config import Config
-from sqlalchemy import func, select, update
+from sqlalchemy import MetaData, Table, func, select, update
 
 from alembic import command
 from src.auth.models import Account, RegistrationDraft, Session
-from src.auth.service import now
+from src.auth.service import PASSWORDS, now, token_hash
 from src.config import ROOT, Settings
 from src.main import create_app
 
@@ -116,15 +116,51 @@ async def test_optional_terms_migration_preserves_existing_account_and_session(
     monkeypatch.setenv("MOGOBE_DATABASE_URL", url)
     cfg = Config(str(ROOT / "alembic.ini"))
     await asyncio.to_thread(command.upgrade, cfg, "ec87067cfd5e")
-    application = create_app(Settings(database_url=url))
+    # Seed using the historical schema. Current ORM/API models intentionally
+    # require the new head (including later administrator columns).
+    from src.database import make_engine
+
+    engine = make_engine(url)
+    token = "existing-session-before-migrations"
     try:
-        async with httpx.AsyncClient(
-            transport=httpx.ASGITransport(app=application), base_url="http://test"
-        ) as api:
-            account = await register(api)
-            token = api.cookies.get("mogobe_session")
+        async with engine.begin() as connection:
+
+            def seed(sync):
+                metadata = MetaData()
+                old_accounts = Table("auth_account", metadata, autoload_with=sync)
+                old_sessions = Table("auth_session", metadata, autoload_with=sync)
+                ident = sync.execute(
+                    old_accounts.insert().values(
+                        username=START["username"],
+                        username_key=START["username"].casefold(),
+                        password_hash=PASSWORDS.hash(START["password"]),
+                        color_id=12,
+                        age=12,
+                        chat_mode="closed",
+                        newsletter=True,
+                        parent_email=FINISH["parent_email"],
+                        terms_accepted_at=now(),
+                        created_at=now(),
+                    )
+                ).inserted_primary_key[0]
+                sync.execute(
+                    old_sessions.insert().values(
+                        token_hash=token_hash(token),
+                        account_id=ident,
+                        expires_at=now() + timedelta(days=1),
+                    )
+                )
+                return {
+                    "id": ident,
+                    "username": START["username"],
+                    "color_id": 12,
+                    "age": 12,
+                    "chat_mode": "closed",
+                }
+
+            account = await connection.run_sync(seed)
     finally:
-        await application.state.engine.dispose()
+        await engine.dispose()
     await asyncio.to_thread(command.upgrade, cfg, "head")
     migrated = create_app(Settings(database_url=url))
     try:
@@ -137,6 +173,7 @@ async def test_optional_terms_migration_preserves_existing_account_and_session(
             assert await db.scalar(select(func.count()).select_from(Session)) == 1
             original = await db.scalar(select(Account))
             assert original.terms_accepted_at is not None
+            assert original.is_admin is False
     finally:
         await migrated.state.engine.dispose()
 

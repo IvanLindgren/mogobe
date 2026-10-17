@@ -6,7 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.models import Account
 from src.auth.service import now
+from src.inventory.service import equipped
 from src.profiles.models import Friendship
+from src.profiles.progression import level
+from src.shops.service import balance
 
 
 def days_registered(created_at: datetime, instant: datetime | None = None) -> int:
@@ -29,10 +32,13 @@ async def public_profile(db: AsyncSession, account: Account) -> dict:
         "color": account.color_id,
         "age": days_registered(account.created_at),
         "friends": friends,
-        "score": 0,
-        "items": [],
-        "isMember": False,
+        "score": account.experience,
+        "level": level(account.experience),
+        "items": await equipped(db, account.id),
+        "isMember": account.is_admin,
+        "isAdmin": account.is_admin,
         **{f"mo_{n}": 0 for n in range(1, 11)},
+        "mo_1": await balance(db, account.id),
     }
 
 

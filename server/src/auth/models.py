@@ -14,6 +14,8 @@ class Account(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    is_admin: Mapped[bool] = mapped_column(default=False, server_default="0")
+    experience: Mapped[int] = mapped_column(default=0, server_default="0")
     username: Mapped[str] = mapped_column(String(15))
     username_key: Mapped[str] = mapped_column(String(30), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255))

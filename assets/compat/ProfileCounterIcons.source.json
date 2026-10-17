@@ -1,0 +1,10 @@
+{
+  "original_game_asset": false,
+  "original_graphics": true,
+  "source": "assets/original/Swf/Assets/Popups/MyProfile.swf",
+  "source_sha256": "a21ed523fc0fd5d337a18b7744d5649234e9aa21ac3c85e3c43969752e0f6c5c",
+  "shape": 144,
+  "class": "MogobeProfileCounterArtwork",
+  "generator": "tools/build_profile_counter_icons.py",
+  "sha256": "6ef330661cfb2f6bcfc3ded688f368937ce527b6fb1c5c3ef4959ba2ea29dcc1"
+}

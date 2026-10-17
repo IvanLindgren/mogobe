@@ -17,12 +17,17 @@ from xml.sax.saxutils import escape
 
 from anyio import CancelScope
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+from sqlalchemy import select
 
 from src.auth.dependencies import get_token
+from src.auth.models import Account
 from src.auth.service import find_account
 from src.legacy.messages import validated_message
+from src.profiles import progression, social
 from src.profiles import service as profiles
-from src.profiles import social
+from src.shops import service as shops
+from src.shops.commands import give
+from src.shops.models import Shop
 from src.world import catalog, service
 from src.world.hub import BUSY_MESSAGE
 from src.world.presence import online_ids
@@ -56,6 +61,8 @@ class LegacyConnection:
         self.hub = socket.app.state.world
         self.outbox = asyncio.Queue(maxsize=256)
         self.writer = None
+        self.quoted_shop = None
+        self.quoted_prices = {}
         self.last_chat = 0.0
         self.muted_ids = set()
 
@@ -213,7 +220,13 @@ class LegacyConnection:
             async with self.socket.app.state.sessions() as db:
                 fields = await profiles.public_profile(db, self.account)
                 self.muted_ids = await social.muted_ids(db, self.account.id)
-            self.state.update(age=fields["age"], friends=fields["friends"], score=fields["score"])
+                self.state["items"] = json.dumps(fields["items"], ensure_ascii=False)
+            self.state.update(
+                {
+                    key: fields[key]
+                    for key in ("age", "friends", "score", "level", "isMember", "isAdmin", "mo_1")
+                }
+            )
             # The extension-based login must populate roomList before SWF sends
             # any extension requests (SmartFoxClient.checkRoomList).
             await self.room_list()
@@ -297,6 +310,40 @@ class LegacyConnection:
                                 self.room,
                             )
                         )
+                    return
+                if action in {"speak", "speakRoom", "speakServer"} and (
+                    text.casefold() == "/shop" or text.casefold().startswith("/shop ")
+                ):
+                    key = text.partition(" ")[2].strip().casefold()
+                    try:
+                        async with self.socket.app.state.sessions() as db:
+                            current = await db.get(Account, self.account.id)
+                            await shops.get_shop(db, key, current)
+                        await self.extension("shop__open", key=key)
+                    except HTTPException:
+                        await self.send(
+                            system(
+                                "pubMsg",
+                                f'<user id="{self.account.id}"/>'
+                                "<txt>speak__Магазин недоступен. Команда: /shop ключ</txt>",
+                                self.room,
+                            )
+                        )
+                    return
+                if action in {"speak", "speakRoom", "speakServer"} and (
+                    text.casefold() == "/give" or text.casefold().startswith("/give ")
+                ):
+                    try:
+                        message = await give(self.socket.app, self.account.id, text)
+                    except HTTPException as exc:
+                        message = str(exc.detail)
+                    await self.send(
+                        system(
+                            "pubMsg",
+                            f'<user id="{self.account.id}"/><txt>speak__{escape(message)}</txt>',
+                            self.room,
+                        )
+                    )
                     return
                 if action in {"speak", "speakRoom", "speakServer"} and text.casefold() == "/online":
                     count = len(online_ids(self.hub))
@@ -394,7 +441,7 @@ class LegacyConnection:
                     age=fields["age"],
                     friends=fields["friends"],
                     groups=[],
-                    member=False,
+                    member=account.is_admin,
                     isRoomOpen=False,
                     newMsgs=0,
                     isAvliablChat=False,
@@ -420,6 +467,7 @@ class LegacyConnection:
                         await self.extension(command, errorId=11, msgId=11)
                         return
                     self.muted_ids = await social.muted_ids(db, self.account.id)
+                self.state["items"] = json.dumps(fields["items"], ensure_ascii=False)
                     counts = {
                         ident: await social.pending_count(db, ident)
                         for ident in (self.account.id, buddy)
@@ -462,7 +510,7 @@ class LegacyConnection:
                     userId=buddy,
                     userName=account.username,
                     groups=[],
-                    member=False,
+                    member=account.is_admin,
                     isRoomOpen=False,
                     newMsgs=0,
                     isAvliablChat=False,
@@ -472,19 +520,78 @@ class LegacyConnection:
                     isBlock=buddy in self.muted_ids,
                 )
             await self.extension(command, msgId=-1, numRequests=counts[self.account.id])
+        elif command == "rooms__getStoreData":
+            data = {"items": [], "categories": []}
+            self.quoted_shop, self.quoted_prices = None, {}
+            async with self.socket.app.state.sessions() as db:
+                current = await db.get(Account, self.account.id)
+                room_key = catalog.BY_ID[self.room]["key"] if self.room else None
+                shop = (
+                    await db.scalar(select(Shop).where(Shop.room_key == room_key))
+                    if room_key
+                    else None
+                )
+                if shop:
+                    try:
+                        shop = await shops.get_shop(db, shop.key, current)
+                        data = await shops.catalog(db, shop, current)
+                        self.quoted_shop = shop.key
+                        self.quoted_prices = {
+                            item["typeId"]: item["price"] for item in data["items"]
+                        }
+                    except HTTPException:
+                        pass
+            await self.extension(command, items=data["items"], categories=data["categories"])
+        elif command == "user__buyItem":
+            ident = params.get("itemId")
+            if type(ident) is not int or ident not in self.quoted_prices or not self.quoted_shop:
+                await self.extension(command, status=False, msgId=2)
+                return
+            async with self.socket.app.state.commerce_lock:
+                async with self.socket.app.state.sessions() as db:
+                    try:
+                        purchase = await shops.purchase(
+                            db, self.account, self.quoted_shop, ident, self.quoted_prices[ident]
+                        )
+                    except HTTPException:
+                        await self.extension(command, status=False, msgId=1)
+                        return
+                await shops.changed(self.socket.app)
+                await progression.notify(
+                    self.socket.app, self.account.id, purchase["experience_awarded"]
+                )
+            await self.extension(command, status=True)
         elif command == "user__getInventoryItems":
             # Inventory belongs to the authenticated mogobe, never a supplied ID.
             ident = params.get("userId", self.account.id)
             if type(ident) is not int or ident != self.account.id:
                 await self.extension(command, items=[], errorId=11)
                 return
-            await self.extension(command, items=[])
+            async with self.socket.app.state.sessions() as db:
+                from src.inventory import service as wardrobe
+                items = await wardrobe.available(db, self.account.id, params.get("mainType"), params.get("placeCategorys"))
+            await self.extension(command, items=items, userId=self.account.id)
+        elif command in ("user__setInUseItem", "user__setNotInUseItem"):
+            from src.inventory import service as wardrobe
+            requested = params.get("items")
+            ids = [row.get("id") if isinstance(row, dict) else None for row in requested] if isinstance(requested, list) else None
+            async with self.socket.app.state.commerce_lock:
+                async with self.socket.app.state.sessions() as db:
+                    try:
+                        items = await wardrobe.change(db, self.account.id, ids, wear=command == "user__setInUseItem")
+                    except HTTPException as error:
+                        await self.extension("error", errorId=11, message=str(error.detail))
+                        return
+                await wardrobe.notify(self.socket.app, self.account.id, items)
+                await self.extension(command, items=items, userId=self.account.id)
         elif command == "user__getGiftsItemList":
             await self.extension(command, items=[])
         elif command == "tipOfDay__getUserTips":
             await self.extension(command, userTips=[])
         elif command == "user__getMyMoney":
-            await self.extension(command, userId=self.user["id"], money=0, coins=0)
+            async with self.socket.app.state.sessions() as db:
+                coins = await shops.balance(db, self.account.id)
+            await self.extension(command, userId=self.user["id"], money=coins, coins=coins)
         # Unsupported gameplay is not acknowledged as a successful purchase,
         # quest, trade or reward. Room traversal is handled above.
 

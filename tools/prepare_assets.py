@@ -47,6 +47,8 @@ def main():
         manifest.append({"path": relative.as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
         if relative.parts[0] in {"registration-assets", "registration-pages", "site"}:
             continue
+        if relative.parts[:2] == ("Swf", "Items"):
+            continue  # Item graphics are served by FastAPI on demand.
         dest = web / relative
         dest.parent.mkdir(parents=True, exist_ok=True)
         copy_resource(path, dest)
@@ -68,11 +70,11 @@ def main():
             dest = web / "runtime" / path.name
             dest.parent.mkdir(parents=True, exist_ok=True)
             copy_resource(path, dest)
-    shutil.copytree(ROOT / "assets/compat", web / "compat", dirs_exist_ok=True, copy_function=copy_resource)
+    shutil.copytree(ROOT / "assets/compat", web / "compat", dirs_exist_ok=True, copy_function=copy_resource, ignore=shutil.ignore_patterns("item-animations"))
     loading = web / "Swf/Assets/LoadingScreens/LoadingScreen_0.swf"
     loading.parent.mkdir(parents=True, exist_ok=True)
     copy_resource(ROOT / "assets/compat/LoadingScreen_0.swf", loading)
-    (web / "servises/lang.aspx").write_bytes((original / "servises/lang.xml").read_bytes())
+    (web / "servises/lang.aspx").write_bytes((ROOT / "assets/compat/lang-numeric-levels.xml").read_bytes())
     for page in (original / "registration-pages").glob("*.html"):
         step = page.name.removesuffix(".aspx.html").removeprefix("Registration")
         step = int(step) if step.isdigit() else "confirm"

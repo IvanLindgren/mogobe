@@ -1,0 +1,8 @@
+{
+  "original_game_asset": false,
+  "source": "assets/original/servises/lang.xml",
+  "source_sha256": "01e9ebfee49c268584dc727293c6f17ede79726a40b0621204d1ecf9dbf04008",
+  "change": "Only UserExperience names become Уровень: 1–12",
+  "generator": "tools/build_numeric_levels.py",
+  "sha256": "bf9744df3f202c8f7895496fa38a297db8b1976de27b717f7b796cdb96b8df71"
+}
