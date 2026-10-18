@@ -23,11 +23,15 @@ def main():
     global OUT
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--catalog',action='store_true')
+    parser.add_argument('--local-assets',action='store_true',help='Reject all backend graphics to verify the standalone item package')
     parser.add_argument('--world-points',action='store_true')
     parser.add_argument('--point-room',action='append',help='Limit repeated room checks after a focused change')
     args=parser.parse_args()
+    if args.local_assets and not (args.catalog or args.world_points):
+        parser.error('--local-assets requires --catalog or --world-points')
     if args.catalog:OUT=ROOT/'verification/admin-catalog'
     if args.world_points:OUT=ROOT/'verification/world-shops'
+    if args.local_assets:OUT=ROOT/'verification/local-item-assets'
     OUT.mkdir(parents=True, exist_ok=True)
     result={"suite":"world-shops" if args.world_points else "admin-catalog" if args.catalog else "shops","account_count":1,"checks":{}}
     processes=[];bridge=None
@@ -39,9 +43,35 @@ def main():
                 env["MOGOBE_BOOTSTRAP_DEFAULTS"]="true" if args.catalog or args.world_points else "false"
                 env['PYTHONPATH']=str(ROOT/'server/.venv/Lib/site-packages')
                 env['MOGOBE_UI_TEST_SECRET']=secrets.token_urlsafe(32);env['MOGOBE_UI_TEST_PROFILE']=str(directory/'webview')
-                backend=subprocess.Popen([sys._base_executable,'run.py','--port','18080'],cwd=ROOT/'server',env=env,stdout=blog,stderr=subprocess.STDOUT);processes.append(backend)
+                backend_command=[sys._base_executable,'run.py','--port','18080']
+                if args.local_assets:
+                    subprocess.run([sys._base_executable,'run.py','--migrate-only'],cwd=ROOT/'server',env=env,stdout=blog,stderr=subprocess.STDOUT,check=True)
+                    # Test-only server: the game must work even when every
+                    # remote thumbnail, category icon and animation is denied.
+                    code = """import logging
+import uvicorn
+from fastapi.responses import Response
+from src.main import app
+logging.basicConfig(level=logging.INFO)
+app.state.graphic_requests=0
+@app.middleware('http')
+async def deny_graphics(request,call_next):
+    if request.url.path.startswith('/api/shop-assets/'):
+        app.state.graphic_requests+=1
+        return Response(status_code=503)
+    return await call_next(request)
+@app.get('/__test__/graphics-requests')
+async def graphic_requests():
+    return {'requests':app.state.graphic_requests}
+uvicorn.run(app,host='127.0.0.1',port=18080,access_log=False)
+"""
+                    backend_command=[sys._base_executable,'-c',code]
+                backend=subprocess.Popen(backend_command,cwd=ROOT/'server',env=env,stdout=blog,stderr=subprocess.STDOUT);processes.append(backend)
                 wait_http('http://127.0.0.1:18080/api/health')
                 api=httpx.Client(base_url='http://127.0.0.1:18080')
+                if args.local_assets:
+                    assert api.get('/api/shop-assets/Display/100.swf').status_code==503
+                    assert api.get('/__test__/graphics-requests').json()['requests']==1
                 assert api.post('/api/auth/registration-drafts',json={'username':'ShopNative','password':'Shop1234','color_id':7}).status_code==201
                 assert api.post('/api/auth/register',json={'age':12,'chat_mode':'open'}).status_code==201
                 with sqlite3.connect(database) as db:db.execute('UPDATE auth_account SET is_admin=1');db.commit()
@@ -364,6 +394,11 @@ def main():
                     result['checks']['world_map_still_loads_with_relative_asset_urls']=True
 
                     result['checks']['self_contained_server_graphics']=api.get('/api/shop-assets/Display/100.swf').status_code==200
+                if args.local_assets:
+                    count=api.get('/__test__/graphics-requests').json()['requests']
+                    result['backend_graphics_requests_from_game']=count-1
+                    assert count==1,count
+                    result['checks']['shops_previews_inventory_and_equipment_work_with_remote_graphics_disabled']=True
                 api.close()
             except Exception:
                 result['error']=traceback.format_exc()

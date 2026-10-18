@@ -6,20 +6,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"testing/fstest"
 	"time"
 )
 
 func TestShopGraphicOverOneMegabyteIsNotTruncated(t *testing.T) {
 	payload := bytes.Repeat([]byte{0x43, 0x57, 0x53}, 700000)
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/api/shop-assets/Display/1.swf" {
-			t.Errorf("unexpected path %s", r.URL.Path)
-		}
-		w.Header().Set("Content-Type", "application/x-shockwave-flash")
-		w.Write(payload)
-	}))
-	defer backend.Close()
-	gateway := New(backend.URL, time.Second)
+	gateway := New("http://127.0.0.1:1", time.Millisecond)
+	gateway.ItemAssets = fstest.MapFS{"Display/1.swf": {Data: payload}}
 	request := httptest.NewRequest("GET", "http://wails.localhost/Swf/Items/Display/1.swf", nil)
 	recorder := httptest.NewRecorder()
 	gateway.Middleware(http.NotFoundHandler()).ServeHTTP(recorder, request)

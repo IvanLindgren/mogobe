@@ -349,7 +349,7 @@ async function waitForServer() {
     window.mogobeScene = {state:'connecting'};
     window.originalConnectionLoaderReady = true;
     await waitForServer();
-    const saved = await fetch('/client/accounts',{cache:'no-store'});
+    const saved = await fetch('/client/accounts/refresh',{method:'POST',cache:'no-store'});
     if(!saved.ok) throw new Error('Не удалось загрузить сохранённых могоби.');
     rememberedMogobes = await saved.json();
     if(new URLSearchParams(location.search).get('registered') === '1' || reconnectRequested) {

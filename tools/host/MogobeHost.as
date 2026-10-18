@@ -99,6 +99,7 @@ package {
             ExternalInterface.addCallback("showOriginalLoading", showOriginalLoading);
             ExternalInterface.addCallback("refreshRememberedState", refreshRememberedState);
             ExternalInterface.addCallback("getLoginControlBounds", getLoginControlBounds);
+            ExternalInterface.addCallback("getSavedAvatarInfo", getSavedAvatarInfo);
             ExternalInterface.addCallback("finishRegistrationLogin", finishRegistrationLogin);
             ExternalInterface.addCallback("beginWorld", beginWorld);
             ExternalInterface.addCallback("getWorldAvatar", getWorldAvatar);
@@ -293,7 +294,7 @@ package {
                 data["savePassword" + i] = Boolean(account.has_session);
                 // This is a non-secret marker. Session tokens never enter Flash/JS.
                 data["userPassword" + i] = account.has_session ? "__MOGOBE_SAVED_SESSION__" : "";
-                data["itemsIdList" + i] = "";
+                data["itemsIdList" + i] = account.item_ids is Array ? account.item_ids.join(",") : "";
                 names.push(String(account.username).toLowerCase());
             }
             rememberedNames = names.join("|");
@@ -1424,6 +1425,20 @@ package {
             var enabled:Boolean = control.visible && control.mouseEnabled;
             if (clip != null) enabled = enabled && clip.buttonMode && clip.currentLabel != "GREYOUT" && clip.hasEventListener(MouseEvent.CLICK);
             return {x:bounds.x, y:bounds.y, width:bounds.width, height:bounds.height, enabled:enabled};
+        }
+
+        public function getSavedAvatarInfo():Array {
+            var result:Array=[];
+            if (currentLogin==null || loginKind!="saved") return result;
+            var names:Array=["mcBigPreviewHolderInst","mcSmallPreviewHolderInst1","mcSmallPreviewHolderInst2","mcSmallPreviewHolderInst3","mcSmallPreviewHolderInst4"];
+            for each(var key:String in names) {
+                var holder:DisplayObject=findNamed(currentLogin,key,0);
+                if(holder==null) continue;
+                var label:TextField=findNamed(holder,"txtNameSmall",0) as TextField;
+                var clothing:Array=[];collectOutfitClips(holder,clothing);
+                result.push({holder:key,username:label==null?"":label.text,clothing:clothing});
+            }
+            return result;
         }
 
         private function inspectRemembered():void {

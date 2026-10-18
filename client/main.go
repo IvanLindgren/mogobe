@@ -34,6 +34,7 @@ func main() {
 	}
 	assets, _ := fs.Sub(web, "frontend")
 	proxy := gateway.New(cfg.ServerURL, time.Duration(cfg.RequestTimeoutSeconds)*time.Second)
+	proxy.ItemAssets, _ = fs.Sub(assets, "items")
 	profileRoot, _ := os.UserCacheDir()
 	if root := uiTestDataDir(); root != "" {
 		profileRoot = root

@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -36,6 +37,9 @@ func (g *Gateway) localAccounts(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	switch {
+	case r.URL.Path == "/client/accounts/refresh" && r.Method == "POST":
+		g.refreshSavedOutfits(r)
+		json.NewEncoder(w).Encode(g.Accounts.List())
 	case r.URL.Path == "/client/accounts" && r.Method == "GET":
 		json.NewEncoder(w).Encode(g.Accounts.List())
 	case r.URL.Path == "/client/login-result" && r.Method == "GET":
@@ -65,6 +69,10 @@ func (g *Gateway) localAccounts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Gateway) remoteJSON(path, method string, body any, token string) (*http.Response, []byte, error) {
+	return g.remoteJSONContext(context.Background(), path, method, body, token)
+}
+
+func (g *Gateway) remoteJSONContext(ctx context.Context, path, method string, body any, token string) (*http.Response, []byte, error) {
 	var reader io.Reader
 	if body != nil {
 		data, err := json.Marshal(body)
@@ -77,7 +85,7 @@ func (g *Gateway) remoteJSON(path, method string, body any, token string) (*http
 	target.Path = strings.TrimRight(target.Path, "/") + path
 	target.RawPath = ""
 	target.RawQuery = ""
-	request, err := http.NewRequest(method, target.String(), reader)
+	request, err := http.NewRequestWithContext(ctx, method, target.String(), reader)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -48,6 +48,7 @@ coverage.xml
 /client/frontend/servises/
 /client/frontend/css/
 /client/frontend/compat/
+/client/frontend/items/
 /client/frontend/runtime/
 /client/frontend/wailsjs/
 /client/frontend/Registration*.aspx

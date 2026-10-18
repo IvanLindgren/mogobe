@@ -27,6 +27,8 @@ type worldNotice struct {
 type worldSocket struct {
 	notices        []worldNotice
 	mu             sync.Mutex
+	avatarID       int
+	avatarName     string
 	token          string
 	generation     uint64
 	socialRevision uint64
@@ -49,6 +51,7 @@ func (g *Gateway) setWorldSession(token string) {
 	}
 	g.world.token = token
 	g.world.generation++
+	g.world.avatarID, g.world.avatarName = 0, ""
 	g.world.error = ""
 	g.world.notices = nil
 }
@@ -227,6 +230,7 @@ func (g *Gateway) serveWorldSocket(w http.ResponseWriter, r *http.Request) {
 						break
 					}
 					g.observeSocialPacket(token, generation, observed[:end])
+					g.observeOutfitPacket(token, generation, observed[:end])
 					observed = observed[end+1:]
 				}
 				// Match the protocol's 64 KiB limit even if a peer never

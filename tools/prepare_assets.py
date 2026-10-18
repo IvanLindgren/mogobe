@@ -12,6 +12,8 @@ import re
 import shutil
 import sys
 
+from prepare_item_assets import prepare_items
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -48,7 +50,7 @@ def main():
         if relative.parts[0] in {"registration-assets", "registration-pages", "site"}:
             continue
         if relative.parts[:2] == ("Swf", "Items"):
-            continue  # Item graphics are served by FastAPI on demand.
+            continue  # Only prepared thumbnails and combined animations are embedded below.
         dest = web / relative
         dest.parent.mkdir(parents=True, exist_ok=True)
         copy_resource(path, dest)
@@ -71,6 +73,7 @@ def main():
             dest.parent.mkdir(parents=True, exist_ok=True)
             copy_resource(path, dest)
     shutil.copytree(ROOT / "assets/compat", web / "compat", dirs_exist_ok=True, copy_function=copy_resource, ignore=shutil.ignore_patterns("item-animations"))
+    prepare_items(ROOT, web / "items")
     loading = web / "Swf/Assets/LoadingScreens/LoadingScreen_0.swf"
     loading.parent.mkdir(parents=True, exist_ok=True)
     copy_resource(ROOT / "assets/compat/LoadingScreen_0.swf", loading)

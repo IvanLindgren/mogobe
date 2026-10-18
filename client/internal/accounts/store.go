@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -14,12 +15,14 @@ const MaxAccounts = 6
 const SavedSessionMarker = "__MOGOBE_SAVED_SESSION__"
 
 type PublicAccount struct {
+	ItemIDs    []int  `json:"item_ids"`
 	Username   string `json:"username"`
 	ColorID    int    `json:"color_id"`
 	HasSession bool   `json:"has_session"`
 }
 
 type entry struct {
+	ItemIDs  []int  `json:"item_ids,omitempty"`
 	Username string `json:"username"`
 	ColorID  int    `json:"color_id"`
 	Token    string `json:"token,omitempty"`
@@ -64,7 +67,7 @@ func (s *Store) List() []PublicAccount {
 	defer s.mu.Unlock()
 	result := make([]PublicAccount, 0, len(s.entries))
 	for _, e := range s.entries {
-		result = append(result, PublicAccount{e.Username, e.ColorID, e.Token != ""})
+		result = append(result, PublicAccount{Username: e.Username, ColorID: e.ColorID, HasSession: e.Token != "", ItemIDs: append([]int{}, e.ItemIDs...)})
 	}
 	return result
 }
@@ -90,7 +93,14 @@ func (s *Store) Remember(username string, color int, token string, rememberName,
 		if !rememberSession {
 			token = ""
 		}
-		next = append(next, entry{username, color, token})
+		var items []int
+		for _, e := range previous {
+			if strings.EqualFold(e.Username, username) {
+				items = e.ItemIDs
+				break
+			}
+		}
+		next = append(next, entry{Username: username, ColorID: color, Token: token, ItemIDs: items})
 	}
 	var removed []string
 	for _, e := range previous {
@@ -108,6 +118,35 @@ func (s *Store) Remember(username string, color int, token string, rememberName,
 		return nil, err
 	}
 	return removed, nil
+}
+
+// UpdateOutfit stores a display-only snapshot, never ownership or permissions.
+// Existing version-1 files without item_ids remain readable.
+func (s *Store) UpdateOutfit(username string, items []int) error {
+	if len(items) > 24 {
+		return errors.New("invalid outfit")
+	}
+	seen := make(map[int]bool)
+	for _, id := range items {
+		if id <= 0 || id > 2147483647 || seen[id] {
+			return errors.New("invalid outfit")
+		}
+		seen[id] = true
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i, e := range s.entries {
+		if !strings.EqualFold(e.Username, username) || slices.Equal(e.ItemIDs, items) {
+			continue
+		}
+		s.entries[i].ItemIDs = append([]int(nil), items...)
+		if err := s.save(); err != nil {
+			s.entries[i] = e
+			return err
+		}
+		break
+	}
+	return nil
 }
 
 func (s *Store) KeepNames(names []string) ([]string, error) {

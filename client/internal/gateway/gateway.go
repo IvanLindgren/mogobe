@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/url"
 	"strings"
@@ -17,7 +18,7 @@ import (
 )
 
 type Gateway struct {
-	graphics        graphicCache
+	ItemAssets      fs.FS
 	CopyAvatarImage ImageCopier
 	target          *url.URL
 	client          *http.Client
@@ -118,7 +119,7 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		g.localAccounts(w, r)
 		return
 	}
-	if r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, "/api/shop-assets/") {
+	if strings.HasPrefix(r.URL.Path, "/api/shop-assets/") {
 		g.serveGraphic(w, r)
 		return
 	}
