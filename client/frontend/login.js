@@ -28,6 +28,7 @@ async function refreshWorldShopPoints(){
 }
 window.onMogobeWorldShop=point=>openMogobeShop('',false,point);
 let activeShopKey = '', shopOpenSeen = 0, shopRevisionSeen = 0, shopFetchSequence = 0;
+let minigameOpenSeen = 0;
 window.onMogobeShopClosed = () => { activeShopKey='';shopFetchSequence++; };
 async function openMogobeShop(key, refresh=false, point="") {
   const sequence=++shopFetchSequence;
@@ -192,10 +193,14 @@ async function watchWorld() {
         return;
       }
       pendingWorldAlerts.push(...(status.notices??[]));
-      if(window.mogobeScene?.state === 'world') {
+      if(['world','minigame'].includes(window.mogobeScene?.state)) {
         if(pendingWorldAlerts.length && (!window.mogobePopup || window.mogobePopup.state==='closed')) {
           const notice=pendingWorldAlerts.shift();
           showMogobePopup('Объявление от '+notice.sender+'\n'+notice.text);
+        }
+        if((status.minigame_serial??0)!==minigameOpenSeen && window.mogobeScene?.state==='world') {
+          minigameOpenSeen=status.minigame_serial??0;
+          if(status.minigame_key) await window.openMogobeMinigame(status.minigame_key);
         }
         if((status.shop_serial??0)!==shopOpenSeen) {
           shopOpenSeen=status.shop_serial??0;
@@ -258,7 +263,7 @@ window.onMogobeMuteChanged = (username, muted, sequence) => {
 };
 
 window.onMogobeReconnect = () => {
-  if(window.mogobeScene?.state !== 'world' || leavingWorld) return;
+  if(!['world','minigame'].includes(window.mogobeScene?.state) || leavingWorld) return;
   leavingWorld = true;
   window.player?.ruffle().callExternalInterface('showOriginalLoading',true);
   setTimeout(async()=>{
@@ -288,7 +293,7 @@ window.onMogobeReconnect = () => {
   },0);
 };
 document.addEventListener('keydown',event=>{
-  if(event.key !== 'F5' || window.mogobeScene?.state !== 'world') return;
+  if(event.key !== 'F5' || !['world','minigame'].includes(window.mogobeScene?.state)) return;
   event.preventDefault();
   event.stopImmediatePropagation();
   window.onMogobeReconnect();

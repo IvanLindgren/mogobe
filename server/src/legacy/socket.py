@@ -24,6 +24,8 @@ from src.auth.dependencies import get_token
 from src.auth.models import Account
 from src.auth.service import find_account
 from src.legacy.messages import validated_message
+from src.minigames import catalog as minigames
+from src.minigames import service as minigame_service
 from src.profiles import progression, social
 from src.profiles import service as profiles
 from src.shops import service as shops
@@ -110,6 +112,7 @@ class LegacyConnection:
     async def join(self, ident, *, arrival_from=None):
         if ident not in ROOMS:
             return
+        await minigame_service.cancel_connection(self.socket.app, self)
         previous = self.room
         if previous is not None and previous != ident:
             self.hub.broadcast(
@@ -313,6 +316,18 @@ class LegacyConnection:
                         )
                     return
                 if action in {"speak", "speakRoom", "speakServer"} and (
+                    text.casefold() == "/game" or text.casefold().startswith("/game ")
+                ):
+                    key = text.partition(" ")[2].strip().casefold()
+                    if key in minigames.GAMES:
+                        await self.extension("minigame__open", key=key)
+                    else:
+                        await self.send(system(
+                            "pubMsg", f'<user id="{self.account.id}"/>'
+                            "<txt>speak__Команда: /game goldfishing</txt>", self.room,
+                        ))
+                    return
+                if action in {"speak", "speakRoom", "speakServer"} and (
                     text.casefold() == "/shop" or text.casefold().startswith("/shop ")
                 ):
                     key = text.partition(" ")[2].strip().casefold()
@@ -403,6 +418,17 @@ class LegacyConnection:
                 await self.extension(command, errorId=69, isAllowPlayGame=-1)
         elif command == "rooms__changeRoom":
             token = params.get("grfCompunentId", params.get("gCId"))
+            game = (
+                minigames.at_entry(catalog.BY_ID[self.room], token, self.player.x, self.player.y)
+                if self.room else None
+            )
+            if game:
+                # The original avatar disabled walking while awaiting its room
+                # reply. A game-entry acknowledgement releases that wait without
+                # constructing an ordinary room-error popup or joining a room.
+                await self.extension(command, isMultiGame=True, errorId=-1, isAllowPlayGame=-1)
+                await self.extension("minigame__open", key=game)
+                return
             destination = (
                 catalog.exit_destination(
                     catalog.BY_ID[self.room], token, self.player.x, self.player.y
@@ -695,6 +721,7 @@ async def socket(ws: WebSocket):
         # Finish releasing the writer/reader before reporting closure.
         with CancelScope(shield=True):
             await asyncio.gather(*tasks, return_exceptions=True)
+            await minigame_service.cancel_connection(ws.app, connection)
             if connection.room is not None:
                 await connection.notify_presence_observers()
             try:

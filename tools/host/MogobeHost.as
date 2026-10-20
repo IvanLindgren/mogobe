@@ -100,6 +100,12 @@ package {
             ExternalInterface.addCallback("refreshRememberedState", refreshRememberedState);
             ExternalInterface.addCallback("getLoginControlBounds", getLoginControlBounds);
             ExternalInterface.addCallback("getSavedAvatarInfo", getSavedAvatarInfo);
+            ExternalInterface.addCallback("openMinigame",openMinigame);
+            ExternalInterface.addCallback("closeMinigame",closeMinigame);
+            ExternalInterface.addCallback("showMinigameResult",showMinigameResult);
+            ExternalInterface.addCallback("getMinigameInfo",getMinigameInfo);
+            ExternalInterface.addCallback("closeMinigameHelp",closeMiniHelp);
+            addEventListener(KeyboardEvent.KEY_DOWN,miniKey,true,300);
             ExternalInterface.addCallback("finishRegistrationLogin", finishRegistrationLogin);
             ExternalInterface.addCallback("beginWorld", beginWorld);
             ExternalInterface.addCallback("getWorldAvatar", getWorldAvatar);
@@ -171,9 +177,11 @@ package {
             var bounds:Rectangle = popupWindow.getBounds(popupWindow);
             popupWindow.x = 384 - bounds.x - bounds.width / 2;
             popupWindow.y = 240 - bounds.y - bounds.height / 2;
-            popupText = popupFont.addText(Object(popupWindow).txtMessage, "", 420) as TextField;
+            // Save the authored message area before FontClass auto-sizes its clone.
+            var originalText:TextField = Object(popupWindow).txtMessage as TextField;
+            popupTextBounds = new Rectangle(originalText.x,originalText.y,originalText.width,originalText.height);
+            popupText = popupFont.addText(originalText, "", 420) as TextField;
             Object(popupWindow).txtMessage = popupText;
-            popupTextBounds = new Rectangle(popupText.x,popupText.y,popupText.width,popupText.height);
             popupTextFormat = popupText.defaultTextFormat;
             // Reuse the original frame artwork, with fixed corners for a taller help panel.
             var artwork:DisplayObject = popupWindow.getChildAt(0);
@@ -213,9 +221,10 @@ package {
 
         public function showMessage(message:String, commands:Boolean = false):void {
             if (popupText == null) return;
-            var format:TextFormat = commands ? new TextFormat(popupTextFormat.font,14,popupTextFormat.color) : popupTextFormat;
-            if (commands) {format.align = TextFormatAlign.LEFT;format.leading=3;}
-            popupText.autoSize = commands ? "left" : "center";
+            var format:TextFormat = new TextFormat(popupTextFormat.font,commands ? 14 : popupTextFormat.size,popupTextFormat.color);
+            format.align = commands ? TextFormatAlign.LEFT : TextFormatAlign.CENTER;
+            format.leading = commands ? 3 : popupTextFormat.leading;
+            popupText.autoSize = "left";
             popupText.defaultTextFormat = format;
             popupText.width = popupTextBounds.width-(commands ? 16 : 0);
             popupText.text = message;
@@ -223,6 +232,7 @@ package {
             popupText.x = popupTextBounds.x;
             popupText.y = popupTextBounds.y;
             var extra:Number = Math.max(0,popupText.height-popupTextBounds.height)+(commands ? 8 : 0);
+            if (!commands) popupText.y += (popupTextBounds.height+extra-popupText.height)/2;
             popupBackground.height = popupBackgroundBounds.height+extra;
             popupBackground.y += popupBackgroundBounds.y-popupBackground.getBounds(popupWindow).y;
             Object(popupWindow).btnConfirm.y = popupButtonY+extra;
@@ -239,6 +249,8 @@ package {
             var button:Rectangle=Object(popupWindow).btnConfirm.getBounds(this);
             var panel:Rectangle=popupWindow.getBounds(this);
             return {text:popupText.text,textBottom:text.bottom,textRight:text.right,buttonTop:button.top,buttonLeft:button.left,lines:popupText.numLines,
+                align:popupText.getTextFormat().align,centerOffsetX:popupText.x+popupText.width/2-popupTextBounds.x-popupTextBounds.width/2,
+                centerOffsetY:popupText.y+popupText.height/2-popupTextBounds.y-(popupTextBounds.height+Math.max(0,popupText.height-popupTextBounds.height))/2,
                 panel:{x:panel.x,y:panel.y,width:panel.width,height:panel.height}};
         }
 
@@ -257,7 +269,7 @@ package {
 
         public function showOriginalLoading(visible:Boolean):void {
             originalPreloader.visible = visible;
-            gameLoader.visible = !visible;
+            gameLoader.visible = !visible && miniLayer == null;
             gameLoader.mouseChildren = !visible;
             gameLoader.mouseEnabled = !visible;
         }
@@ -1606,6 +1618,298 @@ package {
             }
         }
 
+        private var miniLayer:Sprite;
+        private var miniLoader:Loader;
+        private var miniGraphics:Loader;
+        private var miniManager:Loader;
+        private var miniResult:Object;
+        private var miniResultView:MovieClip;
+        private var miniResultShade:DisplayObject;
+        private var miniFrame:MovieClip;
+        private var miniRoot:Object;
+        private var miniData:Object;
+        private var miniReady:Boolean = false;
+        private var miniFinishing:Boolean = false;
+        private var miniFrameRate:Number = 24;
+        private var miniExit:Object;
+        private var miniHelp:Object;
+        private var miniHelpView:MovieClip;
+        private var miniHelpBack:Object;
+        private var miniDisposed:Boolean = false;
+
+        public function openMinigame(data:Object):Boolean {
+            if (miniLayer != null || mainClip == null || worldAvatar == null || currentPopup() != null) return false;
+            if (data == null || data.key != "goldfishing" || data.swf != "/Swf/Games/GoldFishing.swf") return false;
+            miniData = data;
+            miniReady = false;
+            miniFinishing = false;
+            miniDisposed = false;
+            miniFrameRate = stage.frameRate;
+            miniLayer = new Sprite();
+            miniLayer.scrollRect = new Rectangle(0,0,768,480);
+            addChild(miniLayer);
+            miniGraphics = new Loader();
+            miniGraphics.contentLoaderInfo.addEventListener(Event.COMPLETE, miniGraphicsLoaded);
+            miniGraphics.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, miniLoadFailed);
+            miniGraphics.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, miniLoadFailed);
+            miniGraphics.load(new URLRequest("/Swf/Assets/Games/ExternalGamesScreens.swf"),
+                new LoaderContext(false,new ApplicationDomain(ApplicationDomain.currentDomain)));
+            showOriginalLoading(true);
+            setChildIndex(originalPreloader,numChildren-1);
+            return true;
+        }
+
+        private function miniGraphicsLoaded(event:Event):void {
+            if (miniLayer == null) return;
+            try {
+                var frameClass:Class = miniGraphics.contentLoaderInfo.applicationDomain.getDefinition("mlArcadeFrame0") as Class;
+                miniFrame = new frameClass() as MovieClip;
+                miniFrame.gotoAndStop(1);
+                miniLayer.addChild(miniFrame);
+                var buttonClass:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.common.uiControls.ButtonSound") as Class;
+                miniExit = new buttonClass(miniFrame.btnExit,"Выход");
+                miniHelp = new buttonClass(miniFrame.btnHelp,"Помощь");
+                miniExit.addEventListener(MouseEvent.CLICK,miniExitClicked);
+                miniHelp.addEventListener(MouseEvent.CLICK,miniHelpClicked);
+                // Load the unstarted original manager as a library for its GameOver.
+                miniManager = new Loader();
+                miniManager.contentLoaderInfo.addEventListener(Event.COMPLETE, miniManagerLoaded);
+                miniManager.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, miniLoadFailed);
+                miniManager.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, miniLoadFailed);
+                miniManager.load(new URLRequest("/Swf/Apps/ExternalGameManager.swf"),
+                    new LoaderContext(false,new ApplicationDomain(ApplicationDomain.currentDomain)));
+            } catch (error:Error) {
+                miniLoadFailed();
+            }
+        }
+
+        private function miniManagerLoaded(event:Event):void {
+            if (miniLayer == null) return;
+            try {
+                miniLoader = new Loader();
+                miniLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, miniGameLoaded);
+                miniLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, miniLoadFailed);
+                miniLoader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, miniLoadFailed);
+                miniFrame.mcGameHolder.addChild(miniLoader);
+                miniLoader.load(new URLRequest(String(miniData.swf)),
+                    new LoaderContext(false,new ApplicationDomain(ApplicationDomain.currentDomain)));
+            } catch (error:Error) {
+                miniLoadFailed();
+            }
+        }
+
+        private function miniGameLoaded(event:Event):void {
+            if (miniLayer == null) return;
+            try {
+                miniRoot = miniLoader.content;
+                miniRoot.start(miniData.player,miniLayer);
+                miniRoot.addEventListener("GAME_EVENT",miniGameFinished);
+                miniReady = true;
+                stage.frameRate = 15;
+                stage.focus = miniLoader;
+                showOriginalLoading(false);
+                ExternalInterface.call("onMogobeMinigameReady",String(miniData.id));
+            } catch (error:Error) {
+                miniLoadFailed();
+            }
+        }
+
+        private function miniLoadFailed(event:Event = null):void {
+            if (miniData == null || miniFinishing) return;
+            miniFinishing = true;
+            showOriginalLoading(false);
+            ExternalInterface.call("onMogobeMinigameFinished",String(miniData.id),0,false,"Не удалось загрузить рыбалку.");
+        }
+
+        private function miniGameFinished(event:Event):void {
+            if (miniData == null || miniFinishing) return;
+            miniFinishing = true;
+            miniDisposed = true;
+            miniLayer.mouseChildren = false;
+            miniLayer.mouseEnabled = false;
+            var score:Number = Number(Object(event).score);
+            ExternalInterface.call("onMogobeMinigameFinished",String(miniData.id),
+                isFinite(score) ? Math.max(0,Math.floor(score)) : 0,true,"");
+        }
+
+        private function miniExitClicked(event:Event):void {
+            if (miniData == null || miniFinishing) return;
+            var score:int = miniCurrentScore();
+            miniFinishing = true;
+            if (miniRoot != null && !miniDisposed) {
+                miniRoot.removeEventListener("GAME_EVENT",miniGameFinished);
+                try { miniRoot.dispose(miniLayer); } catch (error:Error) {}
+                miniDisposed = true;
+            }
+            ExternalInterface.call("onMogobeMinigameFinished",String(miniData.id),score,false,"");
+        }
+
+        public function showMinigameResult(data:Object):Boolean {
+            if (miniData == null || data == null || data.id != miniData.id || miniResult != null) return false;
+            try {
+                closeMiniHelp();
+                var resultClass:Class = miniManager.contentLoaderInfo.applicationDomain.getDefinition("worlds4u.ExternalGameManager.GameOver") as Class;
+                miniResult = new resultClass(miniGraphics,int(data.score),int(data.coins_awarded),false);
+                miniResultView = miniResult.BaseView as MovieClip;
+                var popups:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.view.popups.PopupsManeger") as Class;
+                miniResultShade = Object(popups).createDisableScreen();
+                miniLayer.addChild(miniResultShade);
+                miniLayer.addChild(miniResultView);
+                // The leaderboard service is not implemented; keep its original disabled state.
+                miniResultView.btnTopTen.gotoAndStop("GREYOUT");
+                miniResultView.btnTopTen.mouseEnabled = false;
+                miniResultView.btnTopTen.mouseChildren = false;
+                miniResultView.btnTopTen.buttonMode = false;
+                miniResult.addEventListener("Exit",miniResultClosed);
+                miniLayer.mouseChildren = true;
+                miniLayer.mouseEnabled = true;
+                stage.frameRate = miniFrameRate;
+                return true;
+            } catch (error:Error) {
+                return false;
+            }
+        }
+
+        private function miniResultClosed(event:Event = null):void {
+            if (miniResult == null || miniData == null) return;
+            var id:String = String(miniData.id);
+            closeMinigame();
+            ExternalInterface.call("onMogobeMinigameResultClosed",id);
+        }
+
+        private function miniCurrentGame():Object {
+            var root:DisplayObjectContainer = miniRoot as DisplayObjectContainer;
+            if (root != null) for (var i:int=0;i<root.numChildren;i++) {
+                var game:DisplayObject = root.getChildAt(i);
+                if (getQualifiedClassName(game) == "com.novelgames.flashgames.goldfishing::Game") return game;
+            }
+            return null;
+        }
+
+        private function miniCurrentScore():int {
+            var game:Object = miniCurrentGame();
+            return game == null ? 0 : Math.max(0,int(game.Score));
+        }
+
+        private function miniHelpClicked(event:Event):void {
+            if (miniData == null || miniHelpView != null || miniFinishing) return;
+            var helpClass:Class = miniGraphics.contentLoaderInfo.applicationDomain.getDefinition("mlHelp") as Class;
+            miniHelpView = new helpClass() as MovieClip;
+            var language:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.model.LanguageManager") as Class;
+            var font:Class = ApplicationDomain.currentDomain.getDefinition("FontClass") as Class;
+            var text:String = Object(language).getInstance().getMessage(1,"GoldFishing");
+            miniHelpView.txtHelp = Object(font).getInstance().addText(miniHelpView.txtHelp,text,60,Object(font).FONT_ARIAL,"left");
+            miniHelpView.mcPrev.visible = false;
+            miniHelpView.mcNext.visible = false;
+            var button:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.common.uiControls.ButtonSound") as Class;
+            miniHelpBack = new button(miniHelpView.mcExitGame,Object(language).getInstance().getMessage(16,"GameManager"));
+            miniHelpBack.addEventListener(MouseEvent.CLICK,closeMiniHelp);
+            miniLayer.addChild(miniHelpView);
+            var timer:Class = miniLoader.contentLoaderInfo.applicationDomain.getDefinition("com.novelgames.flashgames.common.NewTimer") as Class;
+            Object(timer).pause();
+        }
+
+        public function closeMiniHelp(event:Event = null):void {
+            if (miniHelpView == null) return;
+            if (miniHelpBack != null) miniHelpBack.removeAllEventListener();
+            miniLayer.removeChild(miniHelpView);
+            miniHelpView = null;miniHelpBack = null;
+            var timer:Class = miniLoader.contentLoaderInfo.applicationDomain.getDefinition("com.novelgames.flashgames.common.NewTimer") as Class;
+            Object(timer).unpause();
+        }
+
+        private function miniKey(event:KeyboardEvent):void {
+            if (miniLayer == null) return;
+            if (event.keyCode == 116) {
+                event.preventDefault();event.stopImmediatePropagation();
+                ExternalInterface.call("onMogobeReconnect");
+            } else if (event.keyCode == 27) {
+                event.preventDefault();event.stopImmediatePropagation();
+                if (miniHelpView != null) closeMiniHelp();
+                else if (miniResult != null) miniResultClosed();
+                else miniExitClicked(event);
+            }
+        }
+
+        public function closeMinigame():void {
+            if (miniLayer == null) return;
+            miniFinishing = true;
+            closeMiniHelp();
+            if (miniRoot != null && !miniDisposed) {
+                miniRoot.removeEventListener("GAME_EVENT",miniGameFinished);
+                try { miniRoot.dispose(miniLayer); } catch (error:Error) {}
+            }
+            if (miniResult != null) {
+                miniResult.removeEventListener("Exit",miniResultClosed);
+                miniResult.disableEvents();
+            }
+            miniResult = null;miniResultView = null;miniResultShade = null;
+            if (miniExit != null) miniExit.removeAllEventListener();
+            if (miniHelp != null) miniHelp.removeAllEventListener();
+            if (miniLoader != null) {
+                miniLoader.contentLoaderInfo.removeEventListener(Event.COMPLETE,miniGameLoaded);
+                miniLoader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,miniLoadFailed);
+                miniLoader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,miniLoadFailed);
+                try { miniLoader.unloadAndStop(true); } catch (error2:Error) {}
+            }
+            if (miniManager != null) {
+                miniManager.contentLoaderInfo.removeEventListener(Event.COMPLETE,miniManagerLoaded);
+                miniManager.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,miniLoadFailed);
+                miniManager.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,miniLoadFailed);
+                try { miniManager.unloadAndStop(true); } catch (managerError:Error) {}
+            }
+            if (miniGraphics != null) {
+                miniGraphics.contentLoaderInfo.removeEventListener(Event.COMPLETE,miniGraphicsLoaded);
+                miniGraphics.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR,miniLoadFailed);
+                miniGraphics.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR,miniLoadFailed);
+                try { miniGraphics.unloadAndStop(true); } catch (error3:Error) {}
+            }
+            removeChild(miniLayer);
+            miniLayer = null;miniLoader = null;miniGraphics = null;miniManager = null;miniFrame = null;
+            miniRoot = null;miniData = null;miniExit = null;miniHelp = null;miniReady = false;
+            stage.frameRate = miniFrameRate;
+            stage.focus = gameLoader;
+            showOriginalLoading(false);
+        }
+
+        public function getMinigameInfo():Object {
+            if (miniData == null) return null;
+            var info:Object = {id:miniData.id,key:miniData.key,ready:miniReady,finishing:miniFinishing,
+                avatarColor:miniData.player.avatarColor,frameRate:stage.frameRate,
+                score:miniCurrentScore(),helpOpen:miniHelpView != null};
+            var game:Object = miniCurrentGame();
+            if (game != null && !miniDisposed) {
+                info.time = int(game.time);
+                info.hookAngle = Number(game.hook.angle);
+                info.hookX = Number(game.hook.x);info.hookY = Number(game.hook.y);
+                info.targets = [];
+                for (var i:int=0;i<game.thingsHolder.numChildren;i++) {
+                    var thing:Object = game.thingsHolder.getChildAt(i);
+                    if (thing.visible) info.targets.push({x:thing.x,y:thing.y,value:thing.value});
+                }
+            }
+            if (miniHelpView != null) {
+                info.helpText = miniHelpView.txtHelp.text;
+                var back:Rectangle = miniHelpView.mcExitGame.getBounds(this);
+                info.helpBack = {x:back.x,y:back.y,width:back.width,height:back.height};
+            }
+            if (miniResultView != null) {
+                info.resultClass = getQualifiedClassName(miniResultView);
+                info.resultText = collectText(miniResultView);
+                info.resultScore = collectText(miniResultView.mcWinnerTXT);
+                var resultExit:Rectangle = miniResultView.mcExitGame.getBounds(this);
+                info.resultExit = {x:resultExit.x,y:resultExit.y,width:resultExit.width,height:resultExit.height};
+            }
+            if (miniFrame != null) {
+                var exit:Rectangle = miniFrame.btnExit.getBounds(this);
+                info.exit = {x:exit.x,y:exit.y,width:exit.width,height:exit.height};
+                var help:Rectangle = miniFrame.btnHelp.getBounds(this);
+                info.help = {x:help.x,y:help.y,width:help.width,height:help.height};
+            }
+            return info;
+        }
+
+
         private function inspectScene(event:Event):void {
             hasLobby = false;
             mainClip = null;
@@ -1661,9 +1965,10 @@ package {
             updateProfileCounters();
             if (loginKind == "servers") registrationPending = false;
             if (registrationPending) state = "loading";
+            if (miniLayer != null) state = miniReady ? "minigame" : "loading";
             // Suppress input while original Main is building the room/panel.
-            gameLoader.mouseChildren = state != "loading";
-            gameLoader.mouseEnabled = state != "loading";
+            gameLoader.mouseChildren = state != "loading" && miniLayer == null;
+            gameLoader.mouseEnabled = state != "loading" && miniLayer == null;
             var signature:String = state + ":" + room;
             if (signature != lastState) {
                 lastState = signature;

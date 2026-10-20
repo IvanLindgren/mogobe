@@ -91,7 +91,7 @@ def main():
                 with sqlite3.connect(db) as sql:
                     sql.execute("UPDATE auth_account SET is_admin=1 WHERE username='AdminPreview'");sql.commit()
                 edge=Path(os.environ['ProgramFiles(x86)'])/'Microsoft/Edge/Application/msedge.exe'
-                browser=subprocess.Popen([str(edge),'--headless=new','--no-first-run','--disable-gpu', '--remote-debugging-port=18082','--user-data-dir='+str(folder/'edge'),'about:blank'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+                browser=subprocess.Popen([str(edge),'--headless=new','--mute-audio','--no-first-run','--disable-gpu', '--remote-debugging-port=18082','--user-data-dir='+str(folder/'edge'),'about:blank'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
                 processes.append(browser)
                 for _ in range(100):
                     try:

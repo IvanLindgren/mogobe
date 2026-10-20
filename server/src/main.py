@@ -18,6 +18,7 @@ from src.database import make_engine
 from src.inventory.router import router as inventory_router
 from src.legacy.router import router as legacy_router
 from src.legacy.socket import router as socket_router
+from src.minigames.router import router as minigames_router
 from src.profiles.router import router as social_router
 from src.shops.admin_router import router as admin_shops_router
 from src.shops.graphics import router as shop_graphics_router
@@ -93,6 +94,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(legacy_router)
     app.include_router(socket_router)
     app.include_router(world_router)
+    app.include_router(minigames_router)
     app.include_router(social_router)
     app.include_router(admin_router)
     app.include_router(admin_shops_router)

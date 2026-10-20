@@ -260,13 +260,6 @@
     "modified": false
   },
   {
-    "path": "Swf/Games/GoldFishing.swf",
-    "source": "G:/GitHub/mogobe/maps/GoldFishing.swf",
-    "original_name": "GoldFishing.swf",
-    "sha256": "3b852d995bdc7bbfa10cc5b604e2b246bd6d1a6b25e1c92142d5357234fe43f2",
-    "modified": false
-  },
-  {
     "path": "Swf/Rooms/HallOfFame.swf",
     "source": "G:/GitHub/mogobe/maps/HallOfFame.swf",
     "original_name": "HallOfFame.swf",
@@ -37337,6 +37330,177 @@
     "path": "Swf/Items/Categories/BeautySalon.swf",
     "source": "MapSets/BeautySalon.swf",
     "sha256": "ced15a24fb296d5dd84acf8557059b41e6f1d61129a18d3bc51410a39456c202",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/GoldFishing.swf",
+    "source": "user-provided archive/Ru/Rooms/GoldFishing.swf",
+    "sha256": "3b852d995bdc7bbfa10cc5b604e2b246bd6d1a6b25e1c92142d5357234fe43f2",
+    "modified": false
+  },
+  {
+    "path": "Swf/Assets/Games/ExternalGamesScreens.swf",
+    "source": "user-provided archive/Ru/Apps 2/ExternalGamesScreens.swf",
+    "sha256": "63c9af78259f85c9c00f12541fc090192cfc4940a6e641daf61909424f7552e1",
+    "modified": false
+  },
+  {
+    "path": "Swf/Apps/ExternalGameManager.swf",
+    "source": "user-provided archive/Ru/Apps 2/ExternalGameManager.swf",
+    "sha256": "dc58b4854ca87021df7e79fcbd3308c6cebcd2dd13f00dd1793f5bfad2f95279",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/AmazingSheriff.swf",
+    "source": "user-provided MogobeGames.zip!AmazingSheriff.swf",
+    "original_name": "AmazingSheriff.swf",
+    "sha256": "4b356b6c41a08dd05b3d0ef233f8b7373bcd8a384666f9d2741bba2bfc848335",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/BeautySalon.swf",
+    "source": "user-provided MogobeGames.zip!BeautySalon.swf",
+    "original_name": "BeautySalon.swf",
+    "sha256": "d820b76ee13bfdab57f9fd10aaa806816d24184303e76d353e480f6849a2fc1a",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/BeSquare.swf",
+    "source": "user-provided MogobeGames.zip!BeSquare.swf",
+    "original_name": "BeSquare.swf",
+    "sha256": "4b603776b1414226239c3e455fe0c1b1fa53577eb561da4b2bcdff584ac98221",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/Bling.swf",
+    "source": "user-provided MogobeGames.zip!Bling.swf",
+    "original_name": "Bling.swf",
+    "sha256": "5d050da7594edcd17e49ddeb3e989b9fd6212986470ad28cd412cbd18150c208",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/Bowling.swf",
+    "source": "user-provided MogobeGames.zip!Bowling.swf",
+    "original_name": "Bowling.swf",
+    "sha256": "79936789a60d13f484821d240746b78396bf8cff3a7668b5d6f05e29d4709332",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/BrickShex.swf",
+    "source": "user-provided MogobeGames.zip!BrickShex.swf",
+    "original_name": "BrickShex.swf",
+    "sha256": "7a5aafd2c4d2e4e2523916a1ce6fd7185c93c4c5a9a2c6ee263cc3a63cfc9e71",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/CandyMan.swf",
+    "source": "user-provided MogobeGames.zip!CandyMan.swf",
+    "original_name": "CandyMan.swf",
+    "sha256": "9d77456f7210441c1297189e85d27ae6020e8c1c4d116e7500f585ffe2fc1706",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/CarRaceing.swf",
+    "source": "user-provided MogobeGames.zip!CarRaceing.swf",
+    "original_name": "CarRaceing.swf",
+    "sha256": "f018ab3ed414d203a745c94e5b9d650394e6402a7fd2025e29c4697c757f87af",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/Darts.swf",
+    "source": "user-provided MogobeGames.zip!Darts.swf",
+    "original_name": "Darts.swf",
+    "sha256": "6116dc31b9f726138056259f4b2a1bf1a9650ee277fd4f276fd6de46a2c15226",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/GalaxyExplorer.swf",
+    "source": "user-provided MogobeGames.zip!GalaxyExplorer.swf",
+    "original_name": "GalaxyExplorer.swf",
+    "sha256": "8ed5299692c1d4389fef3d0b7ae55a215b5dcf0d0ef3464175f80110355f4f32",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/Preserved/GoldFishing-Telegram.swf",
+    "source": "user-provided MogobeGames.zip!GoldFishing.swf",
+    "original_name": "GoldFishing.swf",
+    "sha256": "8669b0f726f9aa8aaf8aa790eda18e8b11cb4f14a9641804203ebf2a54003dd4",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/GroundHog.swf",
+    "source": "user-provided MogobeGames.zip!GroundHog.swf",
+    "original_name": "GroundHog.swf",
+    "sha256": "8764b0f71bef747c43028820b2e9b9e85913e2fb2df72e95993a85abae12d746",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/Hockey.swf",
+    "source": "user-provided MogobeGames.zip!Hockey.swf",
+    "original_name": "Hockey.swf",
+    "sha256": "aa42e20a8e0400ef7b88d69a154b64a51efdca9146d57cdb75b805d1c16e225b",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/Hoops.swf",
+    "source": "user-provided MogobeGames.zip!Hoops.swf",
+    "original_name": "Hoops.swf",
+    "sha256": "5c8517708194c9577bc1e3022c866ff1e4dc66d991e6bc95cf57d4996013ff1b",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/LifeGuard.swf",
+    "source": "user-provided MogobeGames.zip!LifeGuard.swf",
+    "original_name": "LifeGuard.swf",
+    "sha256": "beebd02def082be5921d11da9f7e4c28cedf3e743dc282ee0c227f55797715a5",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/Marble.swf",
+    "source": "user-provided MogobeGames.zip!Marble.swf",
+    "original_name": "Marble.swf",
+    "sha256": "3804904af4a7f00653fc793dba6f75fc7c4b5b67790fe01d11d805899bafade2",
+    "modified": false
+  },
+  {
+    "path": "Swf/Apps/Games/MatchIt2.swf",
+    "source": "user-provided MogobeGames.zip!MatchIt2.swf",
+    "original_name": "MatchIt2.swf",
+    "sha256": "109936bc75f5346b618096d700f9e7348c5c8f3b3b2952daef4da06bea255e65",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/RedBall.swf",
+    "source": "user-provided MogobeGames.zip!RedBall.swf",
+    "original_name": "RedBall.swf",
+    "sha256": "4b4d011239d88425750098e8f67696a53053eaacdae5412387b0c0770f9a56ec",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/SnowmanSki.swf",
+    "source": "user-provided MogobeGames.zip!SnowmanSki.swf",
+    "original_name": "SnowmanSki.swf",
+    "sha256": "ae742894ba61ba34174543a3721297ca6b3b56f77aae1292051b5a2ac3d1e0e7",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/TowerBlocks.swf",
+    "source": "user-provided MogobeGames.zip!TowerBlocks.swf",
+    "original_name": "TowerBlocks.swf",
+    "sha256": "438a2aa25228e07d215537be43346189965ed31df73ee80a1d92225b02aad34c",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/TrickyCups.swf",
+    "source": "user-provided MogobeGames.zip!TrickyCups.swf",
+    "original_name": "TrickyCups.swf",
+    "sha256": "d66f003d3bbfe522cc238287a9fdb9bd78d23bfe6e940792f919e7d78f6f0dd6",
+    "modified": false
+  },
+  {
+    "path": "Swf/Games/MatchIt.swf",
+    "source": "user-provided archive/He/Games/MatchIt.swf",
+    "sha256": "933fb7edcd4e7fa030edad21e259449b8d19eb3768caf9ff96251a17e229b92c",
     "modified": false
   }
 ]

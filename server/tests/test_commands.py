@@ -118,6 +118,7 @@ def test_help_is_available_to_everyone_and_tracks_current_role(app):
             "/help",
             "/room ключ",
             "/shop ключ",
+            "/game goldfishing",
             "/online",
             "/exit",
         }

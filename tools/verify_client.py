@@ -5,6 +5,7 @@ import subprocess
 import sys
 
 SUITES = {
+    "minigames": ("verify_minigames.py", []),
     "login-outfits": ("verify_login_outfits.py", []),
     "admin-catalog": ("verify_shops.py", ["--catalog"]),
     "commands": ("verify_multiplayer.py", ["--commands"]),

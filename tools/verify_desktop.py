@@ -33,6 +33,7 @@ class DesktopBridge:
         self.port = port
         self.user32 = ctypes.windll.user32
         self.user32.SetProcessDPIAware()
+        self.user32.GetForegroundWindow.restype = wintypes.HWND
         self.hwnd = None
         def window(hwnd, _):
             pid = wintypes.DWORD()
@@ -44,7 +45,39 @@ class DesktopBridge:
         self.user32.EnumWindows(callback, 0)
         if not self.hwnd:
             raise RuntimeError('Test window not found')
-        self.user32.SetForegroundWindow(self.hwnd)
+        self.focus()
+
+    def focus(self, timeout=10):
+        # SetForegroundWindow is asynchronous and may be refused while another
+        # thread owns foreground input. Never send global keys before the
+        # test window has actually become foreground and settled.
+        deadline = time.monotonic()+timeout
+        while time.monotonic()<deadline:
+            if not self.user32.IsWindow(self.hwnd):
+                raise RuntimeError('Test window was closed')
+            if self.user32.IsIconic(self.hwnd):
+                self.user32.ShowWindow(self.hwnd,9)  # SW_RESTORE
+            if self.user32.GetForegroundWindow()==self.hwnd:
+                time.sleep(.15)
+                if self.user32.GetForegroundWindow()==self.hwnd:
+                    return
+            current=ctypes.windll.kernel32.GetCurrentThreadId()
+            foreground=self.user32.GetForegroundWindow()
+            threads={self.user32.GetWindowThreadProcessId(self.hwnd,None)}
+            if foreground:
+                threads.add(self.user32.GetWindowThreadProcessId(foreground,None))
+            attached=[]
+            try:
+                for thread in threads:
+                    if thread and thread!=current and self.user32.AttachThreadInput(current,thread,True):
+                        attached.append(thread)
+                self.user32.BringWindowToTop(self.hwnd)
+                self.user32.SetForegroundWindow(self.hwnd)
+            finally:
+                for thread in reversed(attached):
+                    self.user32.AttachThreadInput(current,thread,False)
+            time.sleep(.1)
+        raise RuntimeError('Test window did not become active; input was not sent')
 
     def call(self, method, **params):
         if method == 'Page.enable':
@@ -60,6 +93,7 @@ class DesktopBridge:
             time.sleep(.05)
             return {}
         if method == 'Input.insertText':
+            self.focus()
             class KEYBDINPUT(ctypes.Structure):
                 _fields_ = [('wVk',wintypes.WORD),('wScan',wintypes.WORD),('dwFlags',wintypes.DWORD),('time',wintypes.DWORD),('extra',ctypes.c_size_t)]
             class DATA(ctypes.Union):
@@ -67,6 +101,8 @@ class DesktopBridge:
             class INPUT(ctypes.Structure):
                 _fields_ = [('type',wintypes.DWORD),('data',DATA)]
             for character in params['text']:
+                if self.user32.GetForegroundWindow()!=self.hwnd:
+                    raise RuntimeError('Window lost focus during typing; input stopped')
                 for flags in [4,6]:
                     event = INPUT(type=1, data=DATA(keyboard=KEYBDINPUT(wScan=ord(character),dwFlags=flags)))
                     self.user32.SendInput(1,ctypes.byref(event),ctypes.sizeof(INPUT))
@@ -94,7 +130,7 @@ class DesktopBridge:
         raise TimeoutError(expression)
 
     def click(self, x, y):
-        self.user32.SetForegroundWindow(self.hwnd)
+        self.focus()
         time.sleep(.05)
         self.call("Input.dispatchMouseEvent", type="mouseMoved", x=x, y=y)
         self.call("Input.dispatchMouseEvent", type="mousePressed", x=x, y=y, button="left", clickCount=1)
@@ -106,7 +142,7 @@ class DesktopBridge:
         self.click(r["x"]+x*r["width"]/768, r["y"]+y*r["height"]/480)
 
     def control(self, name):
-        self.user32.SetForegroundWindow(self.hwnd)
+        self.focus()
         if name in ['btnLogin','btnLoginMultiInst']:
             # Original Button.clickDelay is 5000 ms. Wait for its click handler
             # to return instead of clicking a grey button during that delay.
@@ -140,6 +176,7 @@ class DesktopBridge:
             self.wait("window.mogobePopup?.state === 'open' && window.mogobePopup.message.includes("+json.dumps(next_message)+")")
 
     def type_text(self, text):
+        self.focus()
         # Flash may insert a literal letter for synthetic Ctrl+A under a
         # Russian keyboard layout. Select the single-line field without letters.
         self.user32.keybd_event(0x24,0,0,0)  # Home
@@ -157,7 +194,7 @@ class DesktopBridge:
         self.call('Input.insertText',text=text)
 
     def capture(self, name):
-        self.user32.SetForegroundWindow(self.hwnd)
+        self.focus()
         time.sleep(.2)
         rect = wintypes.RECT()
         self.user32.GetWindowRect(self.hwnd,ctypes.byref(rect))

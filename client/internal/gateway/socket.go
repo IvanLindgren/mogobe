@@ -35,6 +35,8 @@ type worldSocket struct {
 	shopRevision   uint64
 	shopSerial     uint64
 	shopKey        string
+	minigameSerial uint64
+	minigameKey    string
 	error          string
 	url            string
 	origin         string
@@ -54,6 +56,7 @@ func (g *Gateway) setWorldSession(token string) {
 	g.world.avatarID, g.world.avatarName = 0, ""
 	g.world.error = ""
 	g.world.notices = nil
+	g.world.minigameSerial, g.world.minigameKey = 0, ""
 }
 
 func (g *Gateway) StartWorldSocket(preview string) (func(), error) {
@@ -91,9 +94,10 @@ func (g *Gateway) worldStatus(w http.ResponseWriter) {
 	notices := g.world.notices
 	g.world.notices = nil
 	shopRevision, shopSerial, shopKey := g.world.shopRevision, g.world.shopSerial, g.world.shopKey
+	minigameSerial, minigameKey := g.world.minigameSerial, g.world.minigameKey
 	g.world.mu.Unlock()
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]any{"notices": notices, "error": message, "social_revision": revision, "shop_revision": shopRevision, "shop_serial": shopSerial, "shop_key": shopKey})
+	json.NewEncoder(w).Encode(map[string]any{"minigame_serial": minigameSerial, "minigame_key": minigameKey, "notices": notices, "error": message, "social_revision": revision, "shop_revision": shopRevision, "shop_serial": shopSerial, "shop_key": shopKey})
 }
 
 // Social changes already arrive on the game connection. Expose a local
@@ -131,6 +135,10 @@ func (g *Gateway) observeSocialPacket(token string, generation uint64, packet []
 		}
 		if command == "shop__changed" {
 			g.world.shopRevision++
+		}
+		if command == "minigame__open" && event.Body.Object.Key == "goldfishing" {
+			g.world.minigameSerial++
+			g.world.minigameKey = event.Body.Object.Key
 		}
 		if command == "shop__open" {
 			g.world.shopSerial++

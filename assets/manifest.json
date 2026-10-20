@@ -5,7 +5,11 @@
   },
   {
     "path": "sources.json",
-    "sha256": "9ddb190c93c933679667244a8c66d922ed749a0666b39de3fa9777c864f0baf1"
+    "sha256": "4785132df4a094115d2b27f96dd6b6cf8fbff4fec5db3ce268a77b573277c063"
+  },
+  {
+    "path": "telegram-games-import.json",
+    "sha256": "53cf382aaaefd1ae299a372c9c80a2004802caca4d220b1bcd8b190ba7f0face"
   },
   {
     "path": "registration-assets/20120804071109_tab.gif",
@@ -136,6 +140,10 @@
     "sha256": "51ce8aa5e121af634a9621811dc68fbeb31ef21d533a4ad2a17d2fc384b56c93"
   },
   {
+    "path": "Swf/Apps/ExternalGameManager.swf",
+    "sha256": "dc58b4854ca87021df7e79fcbd3308c6cebcd2dd13f00dd1793f5bfad2f95279"
+  },
+  {
     "path": "Swf/Assets/AvatarsGR.swf",
     "sha256": "fb69c6d05e2b6cd56eda9724c10fe2281543e49ce89b3242ad1d0b3229b77196"
   },
@@ -160,8 +168,88 @@
     "sha256": "d55c0d50fc8d7af78e57446e6b18d5876b976502beb4ad6e39eef7bea1d07eef"
   },
   {
+    "path": "Swf/Games/AmazingSheriff.swf",
+    "sha256": "4b356b6c41a08dd05b3d0ef233f8b7373bcd8a384666f9d2741bba2bfc848335"
+  },
+  {
+    "path": "Swf/Games/BeautySalon.swf",
+    "sha256": "d820b76ee13bfdab57f9fd10aaa806816d24184303e76d353e480f6849a2fc1a"
+  },
+  {
+    "path": "Swf/Games/BeSquare.swf",
+    "sha256": "4b603776b1414226239c3e455fe0c1b1fa53577eb561da4b2bcdff584ac98221"
+  },
+  {
+    "path": "Swf/Games/Bling.swf",
+    "sha256": "5d050da7594edcd17e49ddeb3e989b9fd6212986470ad28cd412cbd18150c208"
+  },
+  {
+    "path": "Swf/Games/Bowling.swf",
+    "sha256": "79936789a60d13f484821d240746b78396bf8cff3a7668b5d6f05e29d4709332"
+  },
+  {
+    "path": "Swf/Games/BrickShex.swf",
+    "sha256": "7a5aafd2c4d2e4e2523916a1ce6fd7185c93c4c5a9a2c6ee263cc3a63cfc9e71"
+  },
+  {
+    "path": "Swf/Games/CandyMan.swf",
+    "sha256": "9d77456f7210441c1297189e85d27ae6020e8c1c4d116e7500f585ffe2fc1706"
+  },
+  {
+    "path": "Swf/Games/CarRaceing.swf",
+    "sha256": "f018ab3ed414d203a745c94e5b9d650394e6402a7fd2025e29c4697c757f87af"
+  },
+  {
+    "path": "Swf/Games/Darts.swf",
+    "sha256": "6116dc31b9f726138056259f4b2a1bf1a9650ee277fd4f276fd6de46a2c15226"
+  },
+  {
+    "path": "Swf/Games/GalaxyExplorer.swf",
+    "sha256": "8ed5299692c1d4389fef3d0b7ae55a215b5dcf0d0ef3464175f80110355f4f32"
+  },
+  {
     "path": "Swf/Games/GoldFishing.swf",
     "sha256": "3b852d995bdc7bbfa10cc5b604e2b246bd6d1a6b25e1c92142d5357234fe43f2"
+  },
+  {
+    "path": "Swf/Games/GroundHog.swf",
+    "sha256": "8764b0f71bef747c43028820b2e9b9e85913e2fb2df72e95993a85abae12d746"
+  },
+  {
+    "path": "Swf/Games/Hockey.swf",
+    "sha256": "aa42e20a8e0400ef7b88d69a154b64a51efdca9146d57cdb75b805d1c16e225b"
+  },
+  {
+    "path": "Swf/Games/Hoops.swf",
+    "sha256": "5c8517708194c9577bc1e3022c866ff1e4dc66d991e6bc95cf57d4996013ff1b"
+  },
+  {
+    "path": "Swf/Games/LifeGuard.swf",
+    "sha256": "beebd02def082be5921d11da9f7e4c28cedf3e743dc282ee0c227f55797715a5"
+  },
+  {
+    "path": "Swf/Games/Marble.swf",
+    "sha256": "3804904af4a7f00653fc793dba6f75fc7c4b5b67790fe01d11d805899bafade2"
+  },
+  {
+    "path": "Swf/Games/MatchIt.swf",
+    "sha256": "933fb7edcd4e7fa030edad21e259449b8d19eb3768caf9ff96251a17e229b92c"
+  },
+  {
+    "path": "Swf/Games/RedBall.swf",
+    "sha256": "4b4d011239d88425750098e8f67696a53053eaacdae5412387b0c0770f9a56ec"
+  },
+  {
+    "path": "Swf/Games/SnowmanSki.swf",
+    "sha256": "ae742894ba61ba34174543a3721297ca6b3b56f77aae1292051b5a2ac3d1e0e7"
+  },
+  {
+    "path": "Swf/Games/TowerBlocks.swf",
+    "sha256": "438a2aa25228e07d215537be43346189965ed31df73ee80a1d92225b02aad34c"
+  },
+  {
+    "path": "Swf/Games/TrickyCups.swf",
+    "sha256": "d66f003d3bbfe522cc238287a9fdb9bd78d23bfe6e940792f919e7d78f6f0dd6"
   },
   {
     "path": "Swf/Rooms/Africa.swf",
@@ -372,6 +460,14 @@
     "sha256": "134d94cebd8e2edcb74ceb6df5f0aa2723a985b734f535fd83d69142155e7367"
   },
   {
+    "path": "Swf/Apps/Games/MatchIt2.swf",
+    "sha256": "109936bc75f5346b618096d700f9e7348c5c8f3b3b2952daef4da06bea255e65"
+  },
+  {
+    "path": "Swf/Assets/Games/ExternalGamesScreens.swf",
+    "sha256": "63c9af78259f85c9c00f12541fc090192cfc4940a6e641daf61909424f7552e1"
+  },
+  {
     "path": "Swf/Assets/Popups/BeMember.swf",
     "sha256": "8911fecccf390dc27f077ac4ed903d2e67aed4fd3059e518ebe3b6bffaad4106"
   },
@@ -410,6 +506,10 @@
   {
     "path": "Swf/Assets/Popups/WorldMapRussian.swf",
     "sha256": "0f930e6fec68ad93929ec23f86a5d3b621d436fc06f9b5dc451abbb69d510f99"
+  },
+  {
+    "path": "Swf/Games/Preserved/GoldFishing-Telegram.swf",
+    "sha256": "8669b0f726f9aa8aaf8aa790eda18e8b11cb4f14a9641804203ebf2a54003dd4"
   },
   {
     "path": "Swf/Items/Categories/BeautySalon.swf",

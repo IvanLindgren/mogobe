@@ -1,0 +1,133 @@
+{
+  "source": "user-provided MogobeGames.zip",
+  "archive_sha256": "66e44b248948d63c1dde8fece6bbf3d708420b91ad6f7a70fff01cb950858df9",
+  "entries": [
+    {
+      "file": "AmazingSheriff.swf",
+      "path": "assets/original/Swf/Games/AmazingSheriff.swf",
+      "sha256": "4b356b6c41a08dd05b3d0ef233f8b7373bcd8a384666f9d2741bba2bfc848335",
+      "bytes": 2334117
+    },
+    {
+      "file": "BeautySalon.swf",
+      "path": "assets/original/Swf/Games/BeautySalon.swf",
+      "sha256": "d820b76ee13bfdab57f9fd10aaa806816d24184303e76d353e480f6849a2fc1a",
+      "bytes": 95230
+    },
+    {
+      "file": "BeSquare.swf",
+      "path": "assets/original/Swf/Games/BeSquare.swf",
+      "sha256": "4b603776b1414226239c3e455fe0c1b1fa53577eb561da4b2bcdff584ac98221",
+      "bytes": 925843
+    },
+    {
+      "file": "Bling.swf",
+      "path": "assets/original/Swf/Games/Bling.swf",
+      "sha256": "5d050da7594edcd17e49ddeb3e989b9fd6212986470ad28cd412cbd18150c208",
+      "bytes": 302385
+    },
+    {
+      "file": "Bowling.swf",
+      "path": "assets/original/Swf/Games/Bowling.swf",
+      "sha256": "79936789a60d13f484821d240746b78396bf8cff3a7668b5d6f05e29d4709332",
+      "bytes": 143696
+    },
+    {
+      "file": "BrickShex.swf",
+      "path": "assets/original/Swf/Games/BrickShex.swf",
+      "sha256": "7a5aafd2c4d2e4e2523916a1ce6fd7185c93c4c5a9a2c6ee263cc3a63cfc9e71",
+      "bytes": 191177
+    },
+    {
+      "file": "CandyMan.swf",
+      "path": "assets/original/Swf/Games/CandyMan.swf",
+      "sha256": "9d77456f7210441c1297189e85d27ae6020e8c1c4d116e7500f585ffe2fc1706",
+      "bytes": 3575660
+    },
+    {
+      "file": "CarRaceing.swf",
+      "path": "assets/original/Swf/Games/CarRaceing.swf",
+      "sha256": "f018ab3ed414d203a745c94e5b9d650394e6402a7fd2025e29c4697c757f87af",
+      "bytes": 227394
+    },
+    {
+      "file": "Darts.swf",
+      "path": "assets/original/Swf/Games/Darts.swf",
+      "sha256": "6116dc31b9f726138056259f4b2a1bf1a9650ee277fd4f276fd6de46a2c15226",
+      "bytes": 164813
+    },
+    {
+      "file": "GalaxyExplorer.swf",
+      "path": "assets/original/Swf/Games/GalaxyExplorer.swf",
+      "sha256": "8ed5299692c1d4389fef3d0b7ae55a215b5dcf0d0ef3464175f80110355f4f32",
+      "bytes": 1561132
+    },
+    {
+      "file": "GoldFishing.swf",
+      "path": "assets/original/Swf/Games/Preserved/GoldFishing-Telegram.swf",
+      "sha256": "8669b0f726f9aa8aaf8aa790eda18e8b11cb4f14a9641804203ebf2a54003dd4",
+      "bytes": 737918
+    },
+    {
+      "file": "GroundHog.swf",
+      "path": "assets/original/Swf/Games/GroundHog.swf",
+      "sha256": "8764b0f71bef747c43028820b2e9b9e85913e2fb2df72e95993a85abae12d746",
+      "bytes": 5583938
+    },
+    {
+      "file": "Hockey.swf",
+      "path": "assets/original/Swf/Games/Hockey.swf",
+      "sha256": "aa42e20a8e0400ef7b88d69a154b64a51efdca9146d57cdb75b805d1c16e225b",
+      "bytes": 35414
+    },
+    {
+      "file": "Hoops.swf",
+      "path": "assets/original/Swf/Games/Hoops.swf",
+      "sha256": "5c8517708194c9577bc1e3022c866ff1e4dc66d991e6bc95cf57d4996013ff1b",
+      "bytes": 193170
+    },
+    {
+      "file": "LifeGuard.swf",
+      "path": "assets/original/Swf/Games/LifeGuard.swf",
+      "sha256": "beebd02def082be5921d11da9f7e4c28cedf3e743dc282ee0c227f55797715a5",
+      "bytes": 298900
+    },
+    {
+      "file": "Marble.swf",
+      "path": "assets/original/Swf/Games/Marble.swf",
+      "sha256": "3804904af4a7f00653fc793dba6f75fc7c4b5b67790fe01d11d805899bafade2",
+      "bytes": 212341
+    },
+    {
+      "file": "MatchIt2.swf",
+      "path": "assets/original/Swf/Apps/Games/MatchIt2.swf",
+      "sha256": "109936bc75f5346b618096d700f9e7348c5c8f3b3b2952daef4da06bea255e65",
+      "bytes": 987993
+    },
+    {
+      "file": "RedBall.swf",
+      "path": "assets/original/Swf/Games/RedBall.swf",
+      "sha256": "4b4d011239d88425750098e8f67696a53053eaacdae5412387b0c0770f9a56ec",
+      "bytes": 486408
+    },
+    {
+      "file": "SnowmanSki.swf",
+      "path": "assets/original/Swf/Games/SnowmanSki.swf",
+      "sha256": "ae742894ba61ba34174543a3721297ca6b3b56f77aae1292051b5a2ac3d1e0e7",
+      "bytes": 456080
+    },
+    {
+      "file": "TowerBlocks.swf",
+      "path": "assets/original/Swf/Games/TowerBlocks.swf",
+      "sha256": "438a2aa25228e07d215537be43346189965ed31df73ee80a1d92225b02aad34c",
+      "bytes": 904715
+    },
+    {
+      "file": "TrickyCups.swf",
+      "path": "assets/original/Swf/Games/TrickyCups.swf",
+      "sha256": "d66f003d3bbfe522cc238287a9fdb9bd78d23bfe6e940792f919e7d78f6f0dd6",
+      "bytes": 717786
+    }
+  ],
+  "connected_to_game": false
+}

@@ -152,3 +152,26 @@ func TestDuplicateWorldConnectionReportsErrorWithoutRevokingSession(t *testing.T
 		t.Fatal("Duplicate login must report error and preserve session")
 	}
 }
+
+func TestMinigameOpenUsesOnlyCurrentServerEvent(t *testing.T) {
+	g := New("http://server", time.Second)
+	g.setWorldSession("private")
+	packet := []byte(`{"t":"xt","b":{"o":{"_cmd":"minigame__open","key":"goldfishing"}}}`)
+	g.observeSocialPacket("wrong", g.world.generation, packet)
+	g.observeSocialPacket("private", g.world.generation-1, packet)
+	if g.world.minigameSerial != 0 {
+		t.Fatal("Stale connection started a minigame")
+	}
+	g.observeSocialPacket("private", g.world.generation, []byte(`{"t":"xt","b":{"o":{"_cmd":"minigame__open","key":"unbundled"}}}`))
+	if g.world.minigameSerial != 0 {
+		t.Fatal("Unknown game accepted")
+	}
+	g.observeSocialPacket("private", g.world.generation, packet)
+	if g.world.minigameSerial != 1 || g.world.minigameKey != "goldfishing" {
+		t.Fatal("Current game request missing")
+	}
+	g.setWorldSession("")
+	if g.world.minigameSerial != 0 || g.world.minigameKey != "" {
+		t.Fatal("Game request survived logout")
+	}
+}
