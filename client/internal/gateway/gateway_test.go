@@ -10,6 +10,27 @@ import (
 	"time"
 )
 
+func TestRegistrationPagesUseHTMLWithoutChangingLegacyXML(t *testing.T) {
+	g := New("http://unused.invalid", time.Second)
+	files := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if w.Header().Get("Content-Type") == "" {
+			w.Header().Set("Content-Type", "application/xml")
+		}
+		io.WriteString(w, "<html></html>")
+	})
+	for _, path := range []string{"/Registration2.aspx", "/Registration4.aspx", "/Registrationconfirm.aspx", "/servises/lang.aspx"} {
+		w := httptest.NewRecorder()
+		g.Middleware(files).ServeHTTP(w, httptest.NewRequest("GET", path, nil))
+		want := "text/html; charset=utf-8"
+		if path == "/servises/lang.aspx" {
+			want = "application/xml"
+		}
+		if got := w.Header().Get("Content-Type"); got != want {
+			t.Errorf("%s: content type %q, want %q", path, got, want)
+		}
+	}
+}
+
 func TestLegacyLoginUsesRemoteHTTPSPostAndLocalCookie(t *testing.T) {
 	remote := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" || r.URL.Path != "/prefix/legacy/login" || r.URL.RawQuery != "" {
