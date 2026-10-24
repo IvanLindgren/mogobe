@@ -67,3 +67,7 @@
 Рыбалка использует неизменённые `original/Swf/Games/GoldFishing.swf` из русского набора и `original/Swf/Assets/Games/ExternalGamesScreens.swf` для штатных кнопок, справки и экрана результата. `original/Swf/Apps/ExternalGameManager.swf` загружается как библиотека оригинального класса `GameOver`; его старый сетевой менеджер не запускается. Они включаются обычной подготовкой ресурсов и встраиваются в EXE. Запуск, выход и передача результата реализованы в `MogobeHost.as`; байты оригиналов не менялись.
 
 Пользовательский пак `MogobeGames.zip` импортирован без изменения SWF; список путей и SHA-256 — `original/telegram-games-import.json`. Описание и ограничения — [проверка пака миниигр](../docs/minigames-telegram-pack.md).
+
+## Аудио комнат
+
+Оригинальные `Novograd.mp3`, `otdyhaevo.mp3` и `DukeMaze.mp3` находятся в `original/Sound/Rooms/`. Они включены в обычную подготовку ресурсов и в EXE. Встроенные звуковые потоки локаций остаются в соответствующих SWF. [Привязки, происхождение и проверка](../docs/room-audio.md).

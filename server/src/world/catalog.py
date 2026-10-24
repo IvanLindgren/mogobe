@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 DATA = json.loads(Path(__file__).with_name("rooms.json").read_text(encoding="utf-8"))
+ROOM_AUDIO = json.loads(Path(__file__).with_name("audio.json").read_text(encoding="utf-8"))
 BY_KEY = {room["key"]: room for room in DATA["rooms"]}
 BY_ID = {room["id"]: room for room in DATA["rooms"]}
 BY_NAME = {

@@ -37502,5 +37502,23 @@
     "source": "user-provided archive/He/Games/MatchIt.swf",
     "sha256": "933fb7edcd4e7fa030edad21e259449b8d19eb3768caf9ff96251a17e229b92c",
     "modified": false
+  },
+  {
+    "path": "Sound/Rooms/Novograd.mp3",
+    "source": "user-provided archive/Movies/Novograd.mp3",
+    "sha256": "b5dd31226d53d2b4ea7bb39ecd819fb7fe7a8bd275ab3ef0eb23fcca111a95e8",
+    "modified": false
+  },
+  {
+    "path": "Sound/Rooms/otdyhaevo.mp3",
+    "source": "user-provided archive/Movies/otdyhaevo.mp3",
+    "sha256": "fab7832b29d456483595a0360a00ae8b928d721e4ad9437e930b941ab3a84045",
+    "modified": false
+  },
+  {
+    "path": "Sound/Rooms/DukeMaze.mp3",
+    "source": "user-provided archive/Movies/DukeMaze.mp3",
+    "sha256": "5e2338dd4cfe1556f8dc42aec89f51c38e318bb9785e66be0068c48cfc02d18c",
+    "modified": false
   }
 ]

@@ -132,6 +132,8 @@ class LegacyConnection:
         x, y = self.player.x, self.player.y
         self.state.update(x=x, y=y, AD=4)
         room_vars = {"roomId": ident, "roomName": title, "baseSwf": name, "items": "[]"}
+        if track := catalog.ROOM_AUDIO.get(key):
+            room_vars["rbs"] = track  # Original RoomTO.SFSVar_bgSound, served by the local client.
         others = [p for p in self.hub.members(ident) if p is not self]
         users = self.user_xml() + "".join(p.user_xml() for p in others)
         self.user.update(room=key, x=x, y=y)

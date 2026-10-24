@@ -37,6 +37,7 @@ def test_map_names_all_rooms_and_room_changes_are_authoritative(app):
                 assert int(body.get("r")) == room["id"]
                 variables = {v.get("n"): v.text for v in body.findall("vars/var")}
                 assert variables["baseSwf"] == room["swf"]
+                assert variables.get("rbs") == catalog.ROOM_AUDIO.get(room["key"])
                 state = client.get("/api/world/me", headers=auth(token)).json()
                 assert state["room"] == room["key"] and walkable(
                     room["key"], state["x"], state["y"]
@@ -106,3 +107,17 @@ def test_only_nearby_authored_door_can_change_the_room(app):
             assert fromstring(receive(ws)).find("body").get("r") == str(
                 catalog.resolve("InfoBoard")["id"]
             )
+
+
+def test_room_audio_uses_original_files_in_standalone_client_package():
+    root = Path(__file__).resolve().parents[2] / "assets/original/Sound/Rooms"
+    assert catalog.ROOM_AUDIO["novograd"] == "Novograd.mp3"
+    assert catalog.ROOM_AUDIO["summercamp"] == "otdyhaevo.mp3"
+    assert all(catalog.resolve(key) for key in catalog.ROOM_AUDIO)
+    sources = json.loads((root.parents[1] / "sources.json").read_text(encoding="utf-8"))
+    expected = {entry["path"]: entry["sha256"] for entry in sources}
+    for track in catalog.ROOM_AUDIO.values():
+        assert Path(track).name == track and track.endswith(".mp3")
+        assert hashlib.sha256((root / track).read_bytes()).hexdigest() == expected[
+            "Sound/Rooms/" + track
+        ]

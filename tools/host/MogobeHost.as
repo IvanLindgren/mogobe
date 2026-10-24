@@ -1,6 +1,7 @@
 package {
     import flash.display.BitmapData;
     import flash.utils.ByteArray;
+    import flash.media.SoundMixer;
     import flash.display.DisplayObject;
     import flash.display.DisplayObjectContainer;
     import flash.display.Loader;
@@ -125,6 +126,7 @@ package {
             ExternalInterface.addCallback("getWorldShopPoints",getWorldShopPoints);
             ExternalInterface.addCallback("getWorldShopState",getWorldShopState);
             ExternalInterface.addCallback("getWorldPanelInfo", getWorldPanelInfo);
+            ExternalInterface.addCallback("getRoomAudioInfo", getRoomAudioInfo);
             ExternalInterface.addCallback("getWorldMapInfo", getWorldMapInfo);
             ExternalInterface.addCallback("getChatMenuItems", getChatMenuItems);
             ExternalInterface.addCallback("setSocialState", setSocialState);
@@ -1068,6 +1070,7 @@ package {
             refreshFriendsFonts();
             updateProfileCounters();
             updateWorldPanel();
+            updateRoomAudio();
             watchOriginalShop();
             updateShopLayout();
             var profile:Object = currentProfile();
@@ -1342,6 +1345,65 @@ package {
             field.defaultTextFormat = format;
             field.setTextFormat(format);
             if (field.length == 0) field.scrollH = 0;
+        }
+
+        private var roomAudioManager:Object;
+        private var roomAudioMuted:Boolean = false;
+        private var roomAudioCompletions:int = 0;
+        private var roomAudioQueueCompletions:int = 0;
+        private var roomAudioRestarts:int = 0;
+        private var miniWorldMusicPaused:Boolean = false;
+
+        private function originalSoundManager():Object {
+            if (roomAudioManager == null && ApplicationDomain.currentDomain.hasDefinition("worlds4u.common.SoundManager")) {
+                var cls:Class = ApplicationDomain.currentDomain.getDefinition("worlds4u.common.SoundManager") as Class;
+                roomAudioManager = Object(cls).getInstance();
+                roomAudioManager.addEventListener(Event.SOUND_COMPLETE,onRoomAudioComplete);
+                roomAudioManager.addEventListener(Event.COMPLETE,onRoomAudioQueueComplete);
+            }
+            return roomAudioManager;
+        }
+
+        private function onRoomAudioQueueComplete(event:Event):void {
+            roomAudioQueueCompletions++;
+        }
+
+        private function onRoomAudioComplete(event:Event):void {
+            roomAudioCompletions++;
+        }
+
+        private function updateRoomAudio():void {
+            var muted:Boolean = SoundMixer.soundTransform.volume == 0;
+            var manager:Object = originalSoundManager();
+            // The original manager starts a channel at zero volume in a muted
+            // room. Its setMute(false) changes only the mixer, so restart that
+            // background through its public API when the original button unmutes.
+            if (roomAudioMuted && !muted && miniLayer == null && manager != null && manager.hasSound("BackSoundKey",false)) {
+                manager.playAsBackGround("BackSoundKey");
+                roomAudioRestarts++;
+            }
+            roomAudioMuted = muted;
+        }
+
+        public function getRoomAudioInfo():Object {
+            var manager:Object = originalSoundManager();
+            var present:Boolean = manager != null && manager.hasSound("BackSoundKey",false);
+            var info:Object = {room:activeRoomKey,loaded:present,muted:SoundMixer.soundTransform.volume == 0,
+                mixerVolume:SoundMixer.soundTransform.volume,suspended:miniWorldMusicPaused,
+                completions:roomAudioCompletions,queueCompletions:roomAudioQueueCompletions,restarts:roomAudioRestarts};
+            if (present) {
+                var element:Object = manager.getSoundElement("BackSoundKey");
+                info.url = element.request.url;
+                info.bytesLoaded = element.soundObject.bytesLoaded;
+                info.bytesTotal = element.soundObject.bytesTotal;
+                info.length = element.soundObject.length;
+            }
+            var button:DisplayObject = findNamed(mainClip,"btnMute",0);
+            if (button != null) {
+                var bounds:Rectangle = button.getBounds(this);
+                info.muteButton = {x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height};
+            }
+            return info;
         }
 
         public function getWorldPanelInfo():Object {
@@ -1648,6 +1710,9 @@ package {
             miniLayer = new Sprite();
             miniLayer.scrollRect = new Rectangle(0,0,768,480);
             addChild(miniLayer);
+            var manager:Object = originalSoundManager();
+            miniWorldMusicPaused = manager != null && manager.hasSound("BackSoundKey",false);
+            if (miniWorldMusicPaused) manager.stopBackGround();
             miniGraphics = new Loader();
             miniGraphics.contentLoaderInfo.addEventListener(Event.COMPLETE, miniGraphicsLoaded);
             miniGraphics.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, miniLoadFailed);
@@ -1870,6 +1935,9 @@ package {
             stage.frameRate = miniFrameRate;
             stage.focus = gameLoader;
             showOriginalLoading(false);
+            var manager:Object = originalSoundManager();
+            if (miniWorldMusicPaused && manager != null && manager.hasSound("BackSoundKey",false)) manager.playAsBackGround("BackSoundKey");
+            miniWorldMusicPaused = false;
         }
 
         public function getMinigameInfo():Object {
